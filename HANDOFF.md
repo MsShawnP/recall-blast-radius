@@ -1,0 +1,75 @@
+# HANDOFF — recall-blast-radius
+
+## 2026-06-10 18:30
+
+**Started from:** Brand new project. Only `brief_recall_blast_radius.md` existed.
+
+**Did:** Full scaffold + Phase 0 deep-research (96-agent, 14 confirmed claims) + Phase 1 genealogy schema — DDL, recursive CTE, seed generator (seed=400), dbt staging + mart models, dbt sources.yml tests, Dagster loader asset.
+
+**State:** All Phase 1 files written, nothing run. Two known bugs: O(n²) BOM lookup in generate_genealogy.py; missing parent_id in fct_blast_radius. Not a git repo yet.
+
+**Next:** Fix O(n²) BOM lookup + add parent_id → run end-to-end (docker compose → DDL → generate_genealogy.py → dbt run && dbt test) → register seed=400 in CINDERHAVEN_CANONICAL.md → then Phase 2 (FastAPI /trace endpoint).
+
+---
+
+**Session:** 2026-06-10 (Phase 0 research + Phase 1 schema)
+**Phase:** 1 — Genealogy data model (mostly done; 2 tasks remain)
+**Status:** Schema complete. Not yet run end-to-end.
+
+---
+
+## What was done this session
+
+### Phase 0 research (complete)
+- FSMA 204 date confirmed: **July 20, 2028** (FR Doc. 2025-14967 + Continuing Appropriations Act of 2026)
+- Cinderhaven SKUs NOT on FTL (hot sauce / spice blends are shelf-stable); upstream nuance documented
+- Walmart: all-food mandate, Aug 1 2025 (past); Kroger: all-food GS1 mandate (past)
+- Recall cost: $10M+ (2010 Deloitte/GMA/FMI) — NOT the GMA 2011 whitepaper (common misattribution)
+- All findings in DECISIONS.md (D-001 through D-008)
+
+### Phase 1 data model (mostly complete)
+Written but NOT run:
+- `data/schema/genealogy_ddl.sql` — full DDL: co_packers, ingredients, ingredient_lots, production_batches, batch_ingredient_map, fg_lots, packaging_lots, batch_packaging_map, shipment_lot_map, scenarios + indexes
+- `data/schema/trace_forward.sql` — recursive CTE (ingredient_lot → batch → fg_lot → shipment → retailer)
+- `pipeline/generate_genealogy.py` — seed generator (seed=400); produces ~1,200 ingredient lots, ~600 batches, ~600 FG lots, ~2,400 shipment links, 3 preset scenarios
+- `data/models/staging/` — stg_ingredient_lots, stg_production_batches, stg_fg_lots
+- `data/models/genealogy/` — fct_blast_radius (recursive CTE mart), fct_blast_radius_scope (cost model)
+- `data/models/sources.yml` — all sources with full dbt test coverage
+- `pipeline/assets.py` — Dagster genealogy_seed asset (full Postgres loader)
+
+## What doesn't work yet
+
+End-to-end not run. Likely issues to find:
+1. `generate_genealogy.py` BOM loop has a list comprehension lookup that's O(n²) — should be refactored to a dict lookup before running on full dataset
+2. `fct_blast_radius` recursive CTE in dbt will be slow without pg_recursion depth guard; add `MAXRECURSION` config or depth limit
+3. `dbt_project.yml` needs sources.yml location reference (`source-paths` or model-paths covers it)
+4. The `genealogy_graph` Dagster asset needs parent_id stored in fct_blast_radius to build proper NetworkX edges
+
+## What's next
+
+**Immediate (finish Phase 1):**
+1. Fix the O(n²) BOM lookup in generate_genealogy.py (pre-index ing_lot_pool by date)
+2. Run: `docker compose up -d db && python pipeline/generate_genealogy.py` to verify counts
+3. Run: `dbt run && dbt test` to verify models and tests pass
+4. Register seed=400 in cinderhaven-data-platform/CINDERHAVEN_CANONICAL.md
+
+**Then Phase 2 (graph construction):**
+- Add parent_id to fct_blast_radius for NetworkX edge building
+- Implement the NetworkX graph in genealogy_graph asset
+- Wire up the /trace FastAPI endpoint against fct_blast_radius
+
+## Key files
+
+| File | Purpose |
+|------|---------|
+| `DECISIONS.md` | All research findings (D-001 to D-008) — cite these in the piece |
+| `data/schema/genealogy_ddl.sql` | DDL — run this first against fresh Postgres |
+| `pipeline/generate_genealogy.py` | Seed generator (seed=400) |
+| `data/schema/trace_forward.sql` | The recursive CTE — the core query |
+| `data/models/genealogy/fct_blast_radius.sql` | dbt-ified version of above |
+| `data/models/genealogy/fct_blast_radius_scope.sql` | Scope panel data (cost model) |
+| `pipeline/assets.py` | Dagster asset: genealogy_seed loads everything |
+
+## Cost model (in fct_blast_radius_scope)
+Direct cost per in-channel case: $9–$14 (disposal $4 + freight $1.50 + retailer fees $2.50 + admin $1)
+This is the number that feeds the margin math in the piece.

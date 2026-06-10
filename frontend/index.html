@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Blast Radius — Recall Traceability</title>
+  <link rel="stylesheet" href="src/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand-name">Lailara LLC</div>
+    <div class="brand-subtitle">Risk &amp; Traceability</div>
+  </header>
+
+  <main class="content">
+    <!-- Part 1: Hook -->
+    <section class="hook" id="hook">
+      <h1 class="chart-title">It's 2pm Friday. Your tomato supplier just called.</h1>
+      <!-- TODO: hook copy + scariest stat -->
+    </section>
+
+    <!-- Part 2: Interactive blast radius -->
+    <section class="interactive" id="blast-radius">
+      <div class="scenario-switcher">
+        <button class="scenario-btn active" data-scenario="A">Scenario A</button>
+        <button class="scenario-btn" data-scenario="B">Scenario B</button>
+        <button class="scenario-btn" data-scenario="C">Scenario C</button>
+      </div>
+      <div class="blast-layout">
+        <div id="graph-container"></div>
+        <aside id="scope-panel">
+          <!-- Scope panel: units, sold-through, cost, notification list -->
+        </aside>
+      </div>
+    </section>
+
+    <!-- Part 3: Evidence -->
+    <section class="evidence" id="evidence">
+      <!-- FSMA 204 KDE/CTE mapping table -->
+      <!-- Readiness checklist -->
+    </section>
+  </main>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>

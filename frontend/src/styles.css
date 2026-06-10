@@ -1,0 +1,120 @@
+/* Lailara design system tokens */
+:root {
+  --canvas: #f5f3ee;
+  --text-primary: #333333;
+  --text-secondary: #595959;
+  --gridline: #d9d9d9;
+  --reference: #666666;
+  --ink: #0d0d0d;
+  --navy: #1f2e7a;
+  --navy-hover: #141e52;
+  --navy-light: #8e9ad0;
+  --red: #cc100a;
+  --hk-35: #158f75;
+  --hk-55: #35b595;
+  --hk-70: #6dcdb5;
+  --sg-55: #ee8a2a;
+  --tokyo-40: #b82d4a;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--canvas);
+  color: var(--text-primary);
+  font-family: 'Source Sans 3', 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.site-header {
+  padding: 24px;
+  border-bottom: 1px solid var(--gridline);
+}
+
+.brand-name {
+  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.brand-subtitle {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.content {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 48px 24px;
+}
+
+.hook, .interactive, .evidence {
+  margin-bottom: 60px;
+}
+
+.chart-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--ink);
+  margin-bottom: 24px;
+}
+
+.scenario-switcher {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.scenario-btn {
+  background: transparent;
+  border: 1px solid var(--gridline);
+  border-radius: 2px;
+  padding: 8px 16px;
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.scenario-btn.active {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: #fff;
+}
+
+.blast-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 24px;
+}
+
+#graph-container {
+  background: #fff;
+  border: 1px solid var(--gridline);
+  border-radius: 2px;
+  min-height: 500px;
+}
+
+#scope-panel {
+  background: #1a1a1a;
+  border-radius: 2px;
+  padding: 24px;
+  color: #fff;
+}
+
+@media (max-width: 640px) {
+  .blast-layout { grid-template-columns: 1fr; }
+  .content { padding: 32px 16px; }
+  .brand-name { font-size: 20px; }
+  .chart-title { font-size: 18px; }
+}

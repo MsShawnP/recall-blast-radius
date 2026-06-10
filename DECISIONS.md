@@ -1,0 +1,66 @@
+# DECISIONS — recall-blast-radius
+
+---
+
+## D-001 — FSMA 204 compliance date to cite in the piece
+**Decision:** July 20, 2028  
+**Date:** 2026-06-10  
+**Rationale:** Original date (January 20, 2026) was extended by FDA via proposed rule FR Doc. 2025-14967 (August 7, 2025). Congress independently locked in July 20, 2028 as the non-enforcement date via the Continuing Appropriations Act of 2026 (November 2025). Operationally binding. **Primary source:** federalregister.gov/documents/2025/08/07/2025-14967
+
+---
+
+## D-002 — Cinderhaven SKU FTL coverage
+**Decision:** Hot sauces and dry spice blends are NOT on the FDA Food Traceability List. Do not describe them as FSMA 204-covered finished goods.  
+**Credibility marker to use:** Acknowledge the upstream nuance — if FTL-listed raw ingredients (fresh peppers, leafy greens) enter the co-packer's supply chain, partial traceability obligations attach to *that upstream step*, not to the finished shelf-stable SKU. This is the detail that signals someone who read the rule.  
+**Date:** 2026-06-10
+
+---
+
+## D-003 — Retailer mandate framing
+**Decision:** Cite Walmart (August 1, 2025, all food suppliers) and Kroger (GS1-standard, all food products entering facilities) as already past their internal deadlines — independent of the FDA extension. The regulatory clock is largely theater; the channel pressure is live.  
+**Source quality:** Walmart — primary (Walmart food safety supplier portal). Kroger — secondary (Food Safety Magazine). Do not cite a specific Kroger date without better sourcing.  
+**Date:** 2026-06-10
+
+---
+
+## D-004 — Recall cost figure and attribution
+**Decision:** Use "$10M+ in direct costs" framed as a conservative floor. Correct attribution: 2010 Deloitte Consulting study commissioned by GMA and FMI (54 companies, $481B combined sales). Do NOT attribute to the GMA 2011 whitepaper — that document contains no $10M average; the attribution in secondary literature is a misattribution.  
+**Qualifier to include:** "2010 Deloitte/GMA/FMI; Consumer Brands Association data suggests >50% of companies now exceed this, making it a floor."  
+**Date:** 2026-06-10
+
+---
+
+## D-005 — Genealogy seed number
+**Decision:** seed=400  
+**Rationale:** Existing seeds — 42 (main platform), 200 (distressed scenario), 300 (defect profile). Next available. Must be registered in CINDERHAVEN_CANONICAL.md in cinderhaven-data-platform.  
+**Date:** 2026-06-10
+
+---
+
+## D-006 — Trace direction in v1
+**Decision:** Trace-forward only (ingredient lot → … → stores/retailers)  
+**Rationale:** Trace-back (ingredient sourcing upstream from suppliers) adds co-packer supplier relationship complexity with no narrative payoff in the recall scenario. All three preset scenarios run forward. Trace-back is a natural v2 addition.  
+**Date:** 2026-06-10
+
+---
+
+## D-007 — Preset scenarios vs. free lot picker
+**Decision:** Both. Three preset scenarios for the narrative arc; free lot picker for any lot_id in the data.  
+**Rationale:** The "data integrity work" concern in the brief is resolved by the seed being fully consistent — if every lot has valid genealogy, any lot_id is queryable. Presets are hardcoded for the story; the picker lets a reader explore.  
+**Date:** 2026-06-10
+
+---
+
+## D-009 — Cite the Continuing Appropriations Act as primary FSMA 204 date authority
+**Decision:** When citing the July 20, 2028 FSMA 204 date, the Continuing Appropriations Act of 2026 (November 2025) is the load-bearing citation — not FR Doc. 2025-14967 alone.  
+**Why:** FR Doc. 2025-14967 is a *proposed* rule, not a final rule. A food-industry reader who notices the "proposed" status could dismiss the piece's regulatory framing. Congress's appropriations act independently mandates the same non-enforcement date and is not subject to the proposed/final caveat.  
+**Scope:** Any page, copy, or client deliverable citing the FSMA 204 compliance date.  
+**Do not:** Cite FR Doc. 2025-14967 as the sole authority. Always pair it with the Continuing Appropriations Act of 2026, or lead with the Congressional citation.  
+**Date:** 2026-06-10
+
+---
+
+## D-008 — Genealogy schema placement
+**Decision:** Standalone Postgres in this repo (docker-compose). Includes stub platform tables (product_master, retailers, shipments) seeded from canonical values, plus new `genealogy` schema tables.  
+**Rationale:** Portfolio piece must run standalone without a live connection to cinderhaven-data-platform on Fly.io. SKU IDs and retailer IDs are canonical-conformant (50 SKUs, 6 retailers) so downstream reconciliation is possible if integrated later.  
+**Date:** 2026-06-10

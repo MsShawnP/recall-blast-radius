@@ -1,0 +1,12 @@
+recall_blast_radius:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: localhost
+      user: postgres
+      password: postgres
+      port: 5432
+      dbname: recall_blast_radius
+      schema: public
+      threads: 4
