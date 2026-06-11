@@ -1,5 +1,15 @@
 # HANDOFF — recall-blast-radius
 
+## 2026-06-10 21:30
+
+**What changed:** Phases 4 and 5 complete — D3 blast-radius graph, full narrative layer, FSMA 204 table, readiness checklist
+
+**Why:** Session continued from compacted context; built out the complete frontend (graph → scope panel → narrative → evidence), verified all three scenarios live against the API, and committed both phases.
+
+**State:** Phases 0–5 done and committed. Frontend fully functional: D3 force graph (depth-layered, arrowheads, click-to-pin), scope panel (cases/lots/cost/retailers), scenario B narrative (47× blast radius), margin math panel, FSMA 204 KDE/CTE table (17 elements), 10-question checklist. Known bug: `cases_sold_through` > `cases_in_channel` in scope model (clamped in display; spawn task queued).
+
+**Next:** Phase 6 — `fly deploy` FastAPI to Fly.io, `wrangler pages deploy` frontend to Cloudflare, point `recall.lailarallc.com` subdomain.
+
 ## 2026-06-10 (Phase 4 complete)
 
 **Started from:** Phases 0-3 done. Phase 4 (D3 visualization) was next.
