@@ -147,35 +147,115 @@ def genealogy_seed(context: AssetExecutionContext):
 
 @asset(deps=[genealogy_seed])
 def genealogy_graph(context: AssetExecutionContext):
-    """Build NetworkX graph from genealogy mart tables (post-dbt run)."""
-    import networkx as nx
+    """
+    Build NetworkX graph from fct_blast_radius and pre-compute the three
+    preset scenario JSON responses for fast API serving.
+    """
     import json
+    from pathlib import Path
+    from pipeline.graph import (
+        build_graph, subgraph_for_root, aggregate_shipments,
+        packaging_lot_rows, packaging_lot_scope,
+        scope_row_to_panel, graph_to_api_format, _empty_scope,
+    )
 
     conn = _get_conn()
     cur  = conn.cursor()
 
+    # Load all blast radius rows (ingredient-lot roots)
     cur.execute("""
-        SELECT root_lot_id, node_type, node_id, label, depth
-        FROM genealogy.fct_blast_radius
+        SELECT root_lot_id, node_type, node_id, label, depth, parent_id
+        FROM public.fct_blast_radius
     """)
-    rows = cur.fetchall()
+    br_rows = cur.fetchall()
+
+    # Load scope data keyed by root_lot_id
+    cur.execute("SELECT * FROM public.fct_blast_radius_scope")
+    cols = [d[0] for d in cur.description]
+    scope_by_root = {row[0]: dict(zip(cols, row)) for row in cur.fetchall()}
+
+    # Load scenario definitions
+    cur.execute("""
+        SELECT scenario_id, title, description, root_node_type, root_node_id
+        FROM genealogy.scenarios
+        ORDER BY scenario_id
+    """)
+    scenarios = [
+        {"id": r[0], "title": r[1], "description": r[2],
+         "root_node_type": r[3], "root_node_id": r[4]}
+        for r in cur.fetchall()
+    ]
     cur.close()
+
+    # Build full ingredient-lot graph
+    G = build_graph(br_rows)
+    context.log.info(
+        f"Full graph: {G.number_of_nodes()} nodes, {G.number_of_edges()} edges"
+    )
+
+    # Pre-compute per-scenario sub-graphs
+    scenario_responses = []
+
+    for scenario in scenarios:
+        sid          = scenario["id"]
+        root_id      = scenario["root_node_id"]
+        root_type    = scenario["root_node_type"]
+
+        if root_type == "packaging_lot":
+            # Scenario C: traverse from batch_packaging_map directly
+            pkg_rows = packaging_lot_rows(conn, root_id)
+            sub_G    = build_graph(pkg_rows)
+            scope    = packaging_lot_scope(conn, root_id, pkg_rows)
+        else:
+            sub_G = subgraph_for_root(G, root_id)
+            scope = scope_row_to_panel(scope_by_root[root_id]) \
+                    if root_id in scope_by_root else _empty_scope()
+
+        sub_G = aggregate_shipments(sub_G)
+
+        result = graph_to_api_format(sub_G, root_id, scope)
+        scenario_responses.append({
+            "id":          sid,
+            "title":       scenario["title"],
+            "description": scenario["description"],
+            "result":      result,
+        })
+        context.log.info(
+            f"Scenario {sid}: {sub_G.number_of_nodes()} nodes, "
+            f"{sub_G.number_of_edges()} edges, "
+            f"{scope['cases_in_channel']} cases in channel"
+        )
+
     conn.close()
 
-    G = nx.DiGraph()
-    edges_seen = set()
-
-    for root_lot_id, node_type, node_id, label, depth in rows:
-        G.add_node(node_id, type=node_type, label=label, depth=depth)
-
-    # Edges are implicit in the path progression — add via depth adjacency
-    # (a proper implementation would store parent_id in fct_blast_radius)
-    context.log.info(f"Graph: {G.number_of_nodes()} nodes")
+    # Cache to disk — the FastAPI /scenarios endpoint reads this file
+    cache_dir = Path(__file__).parent / "cache"
+    cache_dir.mkdir(exist_ok=True)
+    cache_path = cache_dir / "scenario_graphs.json"
+    cache_path.write_text(json.dumps(scenario_responses, indent=2, default=str))
+    context.log.info(f"Cached {len(scenario_responses)} scenarios → {cache_path}")
 
 
 @asset(deps=[genealogy_graph])
 def scenario_graphs(context: AssetExecutionContext):
-    """Pre-compute and cache the three preset blast-radius scenario responses."""
-    # Each scenario calls the /trace endpoint logic against the scenario root_node_id.
-    # Output is stored as JSON for fast API serving.
-    pass
+    """Validate that the cached scenario JSON is present and well-formed."""
+    import json
+    from pathlib import Path
+
+    cache_path = Path(__file__).parent / "cache" / "scenario_graphs.json"
+    if not cache_path.exists():
+        raise FileNotFoundError(f"Scenario cache missing: {cache_path}")
+
+    data = json.loads(cache_path.read_text())
+    for s in data:
+        assert s["id"] in ("A", "B", "C"), f"Unexpected scenario id: {s['id']}"
+        assert s["result"]["nodes"], f"Scenario {s['id']} has no nodes"
+        assert s["result"]["edges"], f"Scenario {s['id']} has no edges"
+
+    context.log.info(
+        f"Scenario cache OK: "
+        + ", ".join(
+            f"{s['id']} ({len(s['result']['nodes'])} nodes)"
+            for s in data
+        )
+    )
