@@ -9,10 +9,9 @@ class TraceRequest(BaseModel):
 
 class GraphNode(BaseModel):
     id: str
-    type: Literal["ingredient_lot", "batch", "fg_lot", "case", "shipment", "dc", "retailer", "store"]
+    type: Literal["ingredient_lot", "packaging_lot", "batch", "fg_lot", "shipment", "retailer"]
     label: str
-    units: int | None = None
-    status: Literal["in_channel", "sold_through", "recalled"] | None = None
+    depth: int | None = None
 
 
 class GraphEdge(BaseModel):
@@ -42,3 +41,10 @@ class ScenarioGraph(BaseModel):
     title: str
     description: str
     result: TraceResult
+
+
+class LotSummary(BaseModel):
+    lot_id: str
+    ingredient: str
+    received_date: str
+    status: str

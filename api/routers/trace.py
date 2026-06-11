@@ -1,28 +1,119 @@
+import json
+from pathlib import Path
+
 from fastapi import APIRouter, HTTPException
-from api.models.genealogy import TraceRequest, TraceResult, ScenarioGraph
+
+from api.db import get_conn
+from api.models.genealogy import LotSummary, ScenarioGraph, TraceRequest, TraceResult
+from pipeline.graph import (
+    _empty_scope,
+    aggregate_shipments,
+    build_graph,
+    packaging_lot_rows,
+    packaging_lot_scope,
+    scope_row_to_panel,
+    graph_to_api_format,
+)
 
 router = APIRouter()
+
+SCENARIO_CACHE = Path(__file__).parent.parent.parent / "pipeline" / "cache" / "scenario_graphs.json"
 
 
 @router.post("/trace", response_model=TraceResult)
 def trace_lot(request: TraceRequest):
-    """
-    Trace forward or backward from a given lot_id.
-    Returns graph nodes/edges and scope summary.
-    """
-    # TODO: query genealogy mart, build NetworkX graph, compute scope
-    raise HTTPException(status_code=501, detail="Not implemented")
+    """Trace forward from a lot_id. Returns graph nodes/edges and scope summary."""
+    if request.direction == "backward":
+        raise HTTPException(status_code=400, detail="Trace-back not implemented in v1")
+
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+
+        # Try ingredient lot first (fct_blast_radius is indexed on root_lot_id)
+        cur.execute(
+            "SELECT root_lot_id, node_type, node_id, label, depth, parent_id "
+            "FROM public.fct_blast_radius WHERE root_lot_id = %s",
+            (request.lot_id,),
+        )
+        rows = cur.fetchall()
+
+        if rows:
+            cur.execute(
+                "SELECT * FROM public.fct_blast_radius_scope WHERE root_lot_id = %s",
+                (request.lot_id,),
+            )
+            cols = [d[0] for d in cur.description]
+            scope_row = cur.fetchone()
+            scope = scope_row_to_panel(dict(zip(cols, scope_row))) if scope_row else _empty_scope()
+            cur.close()
+
+            G = aggregate_shipments(build_graph(rows))
+            return graph_to_api_format(G, request.lot_id, scope)
+
+        # Try packaging lot
+        cur.execute(
+            "SELECT 1 FROM genealogy.packaging_lots WHERE packaging_lot_id = %s",
+            (request.lot_id,),
+        )
+        if cur.fetchone():
+            cur.close()
+            pkg_rows = packaging_lot_rows(conn, request.lot_id)
+            scope = packaging_lot_scope(conn, request.lot_id, pkg_rows)
+            G = aggregate_shipments(build_graph(pkg_rows))
+            return graph_to_api_format(G, request.lot_id, scope)
+
+        cur.close()
+        raise HTTPException(status_code=404, detail=f"Lot '{request.lot_id}' not found")
+
+    finally:
+        conn.close()
 
 
-@router.get("/scenarios")
-def get_scenarios() -> list[ScenarioGraph]:
-    """Return the three preset blast-radius scenarios."""
-    # TODO: load pre-computed scenario graphs
-    raise HTTPException(status_code=501, detail="Not implemented")
+@router.get("/scenarios", response_model=list[ScenarioGraph])
+def get_scenarios():
+    """Return the three preset blast-radius scenario graphs (pre-computed cache)."""
+    if not SCENARIO_CACHE.exists():
+        raise HTTPException(
+            status_code=503,
+            detail="Scenario cache not built yet. Run the genealogy_graph Dagster asset first.",
+        )
+    return json.loads(SCENARIO_CACHE.read_text())
 
 
-@router.get("/lots")
+@router.get("/lots", response_model=list[LotSummary])
 def list_lots(q: str = ""):
-    """Search available lots for the lot picker."""
-    # TODO: query lot index from DB
-    raise HTTPException(status_code=501, detail="Not implemented")
+    """Search ingredient lots by lot ID or ingredient name. Returns up to 50 results."""
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        if q:
+            cur.execute(
+                """
+                SELECT il.ingredient_lot_id, i.name, il.received_date::text, il.status
+                FROM genealogy.ingredient_lots il
+                JOIN genealogy.ingredients i USING (ingredient_id)
+                WHERE il.ingredient_lot_id ILIKE %s OR i.name ILIKE %s
+                ORDER BY il.received_date DESC
+                LIMIT 50
+                """,
+                (f"%{q}%", f"%{q}%"),
+            )
+        else:
+            cur.execute(
+                """
+                SELECT il.ingredient_lot_id, i.name, il.received_date::text, il.status
+                FROM genealogy.ingredient_lots il
+                JOIN genealogy.ingredients i USING (ingredient_id)
+                ORDER BY il.received_date DESC
+                LIMIT 50
+                """
+            )
+        rows = cur.fetchall()
+        cur.close()
+        return [
+            {"lot_id": r[0], "ingredient": r[1], "received_date": r[2], "status": r[3]}
+            for r in rows
+        ]
+    finally:
+        conn.close()
