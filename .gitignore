@@ -26,6 +26,8 @@ target/
 dbt_packages/
 logs/
 .dbt/
+data/profiles.yml
+data/.user.yml
 
 # Dagster
 $DAGSTER_HOME/

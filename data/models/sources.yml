@@ -16,9 +16,17 @@ sources:
           - name: ingredient_lot_id
             tests: [unique, not_null]
           - name: ingredient_id
-            tests: [not_null, relationships: {to: source('genealogy', 'ingredients'), field: ingredient_id}]
+            tests:
+              - not_null
+              - relationships:
+                  to: source('genealogy', 'ingredients')
+                  field: ingredient_id
           - name: co_packer_id
-            tests: [not_null, relationships: {to: source('genealogy', 'co_packers'), field: co_packer_id}]
+            tests:
+              - not_null
+              - relationships:
+                  to: source('genealogy', 'co_packers')
+                  field: co_packer_id
           - name: received_date
             tests: [not_null]
           - name: status
@@ -37,9 +45,17 @@ sources:
           - name: batch_id
             tests: [unique, not_null]
           - name: sku_id
-            tests: [not_null, relationships: {to: source('raw', 'product_master'), field: sku_id}]
+            tests:
+              - not_null
+              - relationships:
+                  to: source('raw', 'product_master')
+                  field: sku_id
           - name: co_packer_id
-            tests: [not_null, relationships: {to: source('genealogy', 'co_packers'), field: co_packer_id}]
+            tests:
+              - not_null
+              - relationships:
+                  to: source('genealogy', 'co_packers')
+                  field: co_packer_id
           - name: status
             tests:
               - not_null
@@ -49,16 +65,28 @@ sources:
       - name: batch_ingredient_map
         columns:
           - name: batch_id
-            tests: [not_null, relationships: {to: source('genealogy', 'production_batches'), field: batch_id}]
+            tests:
+              - not_null
+              - relationships:
+                  to: source('genealogy', 'production_batches')
+                  field: batch_id
           - name: ingredient_lot_id
-            tests: [not_null, relationships: {to: source('genealogy', 'ingredient_lots'), field: ingredient_lot_id}]
+            tests:
+              - not_null
+              - relationships:
+                  to: source('genealogy', 'ingredient_lots')
+                  field: ingredient_lot_id
 
       - name: fg_lots
         columns:
           - name: fg_lot_id
             tests: [unique, not_null]
           - name: batch_id
-            tests: [not_null, relationships: {to: source('genealogy', 'production_batches'), field: batch_id}]
+            tests:
+              - not_null
+              - relationships:
+                  to: source('genealogy', 'production_batches')
+                  field: batch_id
           - name: sku_id
             tests: [not_null]
           - name: status
@@ -70,9 +98,17 @@ sources:
       - name: shipment_lot_map
         columns:
           - name: shipment_id
-            tests: [not_null, relationships: {to: source('raw', 'shipments'), field: shipment_id}]
+            tests:
+              - not_null
+              - relationships:
+                  to: source('raw', 'shipments')
+                  field: shipment_id
           - name: fg_lot_id
-            tests: [not_null, relationships: {to: source('genealogy', 'fg_lots'), field: fg_lot_id}]
+            tests:
+              - not_null
+              - relationships:
+                  to: source('genealogy', 'fg_lots')
+                  field: fg_lot_id
           - name: cases_shipped
             tests: [not_null]
 
@@ -84,7 +120,11 @@ sources:
       - name: scenarios
         columns:
           - name: scenario_id
-            tests: [unique, not_null, accepted_values: {values: [A, B, C]}]
+            tests:
+              - unique
+              - not_null
+              - accepted_values:
+                  values: [A, B, C]
 
   - name: raw
     schema: raw
@@ -108,4 +148,8 @@ sources:
           - name: shipment_id
             tests: [unique, not_null]
           - name: retailer_id
-            tests: [not_null, relationships: {to: source('raw', 'retailers'), field: retailer_id}]
+            tests:
+              - not_null
+              - relationships:
+                  to: source('raw', 'retailers')
+                  field: retailer_id

@@ -4,109 +4,97 @@
         indexes=[
             {'columns': ['root_lot_id']},
             {'columns': ['node_type', 'node_id']},
+            {'columns': ['parent_id']},
         ]
     )
 }}
 
 /*
-  Pre-materializes the full blast radius for every ingredient lot and
-  packaging lot in the dataset. This powers the API's /trace endpoint
-  without running a live recursive CTE per request.
+  Pre-materializes the full blast radius for every ingredient lot.
+  Fixed 5-level DAG: ingredient_lot → batch → fg_lot → shipment → retailer.
 
-  For a production scale-out: run incrementally, or compute on-demand
-  via the FastAPI route (which calls trace_forward.sql directly).
+  No recursion needed — the supply chain depth is known and bounded.
+  parent_id enables NetworkX edge construction in the Dagster graph asset.
 */
 
-with recursive blast_radius as (
+with
 
-    -- Seed: all ingredient lots
+il_seed as (
     select
+        il.ingredient_lot_id        as root_lot_id,
         'ingredient_lot'            as node_type,
         il.ingredient_lot_id        as node_id,
-        i.name                      as label,
-        il.ingredient_lot_id        as root_lot_id,
+        ing.name                    as label,
         0                           as depth,
-        array[il.ingredient_lot_id] as path
+        null::text                  as parent_id
     from {{ ref('stg_ingredient_lots') }} il
-    join {{ source('genealogy', 'ingredients') }} i using (ingredient_id)
+    join {{ source('genealogy', 'ingredients') }} ing using (ingredient_id)
+),
 
-    union all
-
-    -- ingredient_lot → batch
+batch_level as (
     select
-        'batch',
-        bim.batch_id,
-        pb.co_packer_batch_code,
-        br.root_lot_id,
-        br.depth + 1,
-        br.path || bim.batch_id
-    from blast_radius br
+        il.root_lot_id,
+        'batch'                     as node_type,
+        bim.batch_id                as node_id,
+        pb.co_packer_batch_code     as label,
+        1                           as depth,
+        il.node_id                  as parent_id
+    from il_seed il
     join {{ source('genealogy', 'batch_ingredient_map') }} bim
-        on bim.ingredient_lot_id = br.node_id
+        on bim.ingredient_lot_id = il.node_id
     join {{ ref('stg_production_batches') }} pb
         on pb.batch_id = bim.batch_id
-    where br.node_type = 'ingredient_lot'
-      and not bim.batch_id = any(br.path)
+),
 
-    union all
-
-    -- batch → fg_lot
+fg_level as (
     select
-        'fg_lot',
-        fl.fg_lot_id,
-        fl.internal_lot_code,
-        br.root_lot_id,
-        br.depth + 1,
-        br.path || fl.fg_lot_id
-    from blast_radius br
+        b.root_lot_id,
+        'fg_lot'                    as node_type,
+        fl.fg_lot_id                as node_id,
+        fl.internal_lot_code        as label,
+        2                           as depth,
+        b.node_id                   as parent_id
+    from batch_level b
     join {{ ref('stg_fg_lots') }} fl
-        on fl.batch_id = br.node_id
-    where br.node_type = 'batch'
-      and not fl.fg_lot_id = any(br.path)
+        on fl.batch_id = b.node_id
+),
 
-    union all
-
-    -- fg_lot → shipment
+shipment_level as (
     select
-        'shipment',
-        slm.shipment_id,
-        s.ship_date::text,
-        br.root_lot_id,
-        br.depth + 1,
-        br.path || slm.shipment_id
-    from blast_radius br
+        f.root_lot_id,
+        'shipment'                  as node_type,
+        slm.shipment_id             as node_id,
+        s.ship_date::text           as label,
+        3                           as depth,
+        f.node_id                   as parent_id
+    from fg_level f
     join {{ source('genealogy', 'shipment_lot_map') }} slm
-        on slm.fg_lot_id = br.node_id
+        on slm.fg_lot_id = f.node_id
     join {{ source('raw', 'shipments') }} s
         on s.shipment_id = slm.shipment_id
-    where br.node_type = 'fg_lot'
-      and not slm.shipment_id = any(br.path)
+),
 
-    union all
-
-    -- shipment → retailer
+retailer_level as (
     select
-        'retailer',
-        s.retailer_id,
-        r.retailer_name,
-        br.root_lot_id,
-        br.depth + 1,
-        br.path || s.retailer_id
-    from blast_radius br
+        sh.root_lot_id,
+        'retailer'                  as node_type,
+        r.retailer_id               as node_id,
+        r.retailer_name             as label,
+        4                           as depth,
+        sh.node_id                  as parent_id
+    from shipment_level sh
     join {{ source('raw', 'shipments') }} s
-        on s.shipment_id = br.node_id
+        on s.shipment_id = sh.node_id
     join {{ source('raw', 'retailers') }} r
         on r.retailer_id = s.retailer_id
-    where br.node_type = 'shipment'
-      and not s.retailer_id = any(br.path)
-
 )
 
-select
-    root_lot_id,
-    node_type,
-    node_id,
-    label,
-    depth,
-    path
-from blast_radius
+select root_lot_id, node_type, node_id, label, depth, parent_id from il_seed
+union all
+select root_lot_id, node_type, node_id, label, depth, parent_id from batch_level
+union all
+select root_lot_id, node_type, node_id, label, depth, parent_id from fg_level
+union all
+select root_lot_id, node_type, node_id, label, depth, parent_id from shipment_level
+union all
+select root_lot_id, node_type, node_id, label, depth, parent_id from retailer_level

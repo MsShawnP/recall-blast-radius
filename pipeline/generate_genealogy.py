@@ -223,14 +223,17 @@ def generate_all():
     cp_by_format = {cp["co_packer_id"]: cp for cp in CO_PACKERS}
     ing_lot_pool: dict[str, list[str]] = {ing[0]: [] for ing in INGREDIENTS}
 
+    # Packaging items tracked via batch_packaging_map, not ingredient lots
+    non_packaging = [i for i in INGREDIENTS if i[2] != "packaging"]
+    packaging_ing_ids = {i[0] for i in INGREDIENTS if i[2] == "packaging"}
+
     n_days = (DATA_END - DATA_START).days
     lot_seq_counter: dict[str, int] = {}
 
     for _ in range(1_200):
-        ing = rng.choice(INGREDIENTS)
+        ing = rng.choice(non_packaging)
         ing_id = ing[0]
-        cp = rng.choice([c for c in CO_PACKERS
-                         if ing[2] != "packaging"])  # packaging lots handled separately
+        cp = rng.choice(CO_PACKERS)
         d = DATA_START + timedelta(days=rng.randint(0, n_days - 90))
         lot_seq_counter[ing_id] = lot_seq_counter.get(ing_id, 0) + 1
         seq = lot_seq_counter[ing_id]
@@ -252,6 +255,12 @@ def generate_all():
             "status":             "consumed",
         })
         ing_lot_pool[ing_id].append(lot_id)
+
+    # O(1) lookup: ingredient_lot_id → received_date (avoids O(n²) index scan in BOM loop)
+    ing_lot_received: dict[str, str] = {
+        r["ingredient_lot_id"]: r["received_date"]
+        for r in records["ingredient_lots"]
+    }
 
     # Production batches — ~600 over 3 years
     sku_cp_map = {}
@@ -290,13 +299,12 @@ def generate_all():
                 "status":               "shipped",
             })
 
-            # Assign ingredient lots (BOM)
-            bom_ings = LINE_INGREDIENTS.get(line, [])
+            # Assign ingredient lots (BOM) — packaging handled via batch_packaging_map
+            bom_ings = [i for i in LINE_INGREDIENTS.get(line, [])
+                        if i not in packaging_ing_ids]
             for ing_id in bom_ings:
                 candidates = [l for l in ing_lot_pool.get(ing_id, [])
-                              if records["ingredient_lots"][[r["ingredient_lot_id"]
-                                  for r in records["ingredient_lots"]].index(l)]
-                                  ["received_date"] <= prod_date.isoformat()]
+                              if ing_lot_received[l] <= prod_date.isoformat()]
                 if not candidates:
                     continue
                 chosen_lot = rng.choice(candidates[-20:])  # bias recent lots
