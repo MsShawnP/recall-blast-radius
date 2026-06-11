@@ -1,13 +1,13 @@
 # PLAN — recall-blast-radius
 
 **Tier:** Heavy (new product, Cinderhaven extension, regulatory domain)
-**Status:** Scaffolded — not started
+**Status:** Phase 1 complete — Phase 2 in progress
 
 ---
 
 ## Current Focus
 
-None — fresh scaffold. Start with Phase 1 research, then Phase 2 data.
+Phase 2 — Graph construction (NetworkX graph from fct_blast_radius + parent_id).
 
 ---
 
@@ -23,7 +23,7 @@ None — fresh scaffold. Start with Phase 1 research, then Phase 2 data.
 - [x] Lot picker: **preset scenarios + free picker**
 - [x] Genealogy seed: **400** (42/200/300 taken)
 
-### Phase 1 — Genealogy data model (IN PROGRESS)
+### Phase 1 — Genealogy data model ✅ DONE (2026-06-10)
 - [x] Design lot genealogy schema — `data/schema/genealogy_ddl.sql`
 - [x] Lot-code format realism — 3 co-packer formats (julian_line, sequential_date, yearweek_seq)
 - [x] Recursive CTE traversal — `data/schema/trace_forward.sql`
@@ -32,8 +32,8 @@ None — fresh scaffold. Start with Phase 1 research, then Phase 2 data.
 - [x] dbt genealogy mart — fct_blast_radius, fct_blast_radius_scope
 - [x] dbt: sources.yml with tests (not-null, unique, referential integrity, accepted_values)
 - [x] Dagster: genealogy_seed asset (loads all tables) + genealogy_graph stub
-- [ ] Register seed=400 in CINDERHAVEN_CANONICAL.md — **TODO: do this in cinderhaven-data-platform**
-- [ ] Run end-to-end: docker compose up → generate_genealogy → dbt run → verify counts
+- [x] Register seed=400 in CINDERHAVEN_CANONICAL.md — **TODO: do this in cinderhaven-data-platform**
+- [x] Run end-to-end: docker compose up → generate_genealogy → dbt run → verify counts
 
 ### Phase 2 — Graph construction
 - [ ] Python: build NetworkX graph from genealogy mart
