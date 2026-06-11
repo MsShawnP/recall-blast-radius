@@ -60,6 +60,46 @@
 
 ---
 
+## D-010 — Commit scenario cache to the repo
+
+**Decision:** `pipeline/cache/scenario_graphs.json` is committed to git alongside the source code.
+
+**Date:** 2026-06-10
+
+**Why:** The `/scenarios` endpoint reads from this file at serve time. Without it in the repo, deploying the API requires running `build_cache.py` against the live database as a post-deploy step — adding a Fly proxy dependency to the deploy pipeline. Committing the cache means the API serves scenarios on boot, with no DB required for that endpoint.
+
+**Scope:** This repo only. The cache is generated data, but the deploy-time tradeoff favors committing it.
+
+**Do not:** Commit the cache after a seed change without verifying the scenario graphs still match the narrative copy (case counts, retailer lists, cost figures are cited in index.html).
+
+---
+
+## D-011 — Use `python -m uvicorn` not bare `uvicorn` on this machine
+
+**Decision:** All launch configs and scripts that start uvicorn use `python -m uvicorn`, not `uvicorn` as a standalone executable.
+
+**Date:** 2026-06-10
+
+**Why:** On Windows Store Python, uvicorn's script entry point is not on the system PATH. `uvicorn` as a command produces `ENOENT`; `python -m uvicorn` works because Python itself is on PATH.
+
+**Scope:** `.claude/launch.json`, any Makefile or run script added to this repo, deployment documentation.
+
+**Do not:** Use bare `uvicorn` as a command in any config file in this project.
+
+---
+
+## D-012 — Use preview_snapshot over preview_screenshot for page verification
+
+**Decision:** `preview_snapshot` (accessibility tree) is the primary tool for verifying page content in this project. `preview_screenshot` is unreliable with D3 SVG pages.
+
+**Date:** 2026-06-10
+
+**Why:** D3 force simulations and/or the headless browser renderer cause `preview_screenshot` to time out consistently (30s). `preview_snapshot` returns the full DOM text tree instantly and is sufficient to verify labels, structure, and data values. Use `preview_eval` for computed values or JS state.
+
+**Scope:** All frontend verification in this project during development.
+
+---
+
 ## D-008 — Genealogy schema placement
 **Decision:** Standalone Postgres in this repo (docker-compose). Includes stub platform tables (product_master, retailers, shipments) seeded from canonical values, plus new `genealogy` schema tables.  
 **Rationale:** Portfolio piece must run standalone without a live connection to cinderhaven-data-platform on Fly.io. SKU IDs and retailer IDs are canonical-conformant (50 SKUs, 6 retailers) so downstream reconciliation is possible if integrated later.  

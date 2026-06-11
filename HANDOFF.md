@@ -1,5 +1,17 @@
 # HANDOFF — recall-blast-radius
 
+## 2026-06-10 22:00 (wrap)
+
+**Started from:** Phase 4 code written but untested; `build_cache.py` just written; Phase 5 not started.
+
+**Did:** Verified Phase 4 end-to-end (fixed scope panel path bug, AbortController timeout, soldPct clamp); ran cache builder against Fly proxy; started API + frontend servers; verified all 3 scenarios. Wrote Phase 5: Scenario B narrative, margin math ($52K–$81K vs $10M+ vs ~$2.75M EBITDA), FSMA 204 KDE/CTE table, 10-question checklist.
+
+**State:** Phases 0–5 complete and committed. Frontend fully functional. Known bug: sold-through > in-channel in scope model (spawn task queued).
+
+**Next:** Phase 6 — write Dockerfile, `fly deploy` FastAPI, `wrangler pages deploy` frontend, configure `recall.lailarallc.com`. Check Fly env vars (`DATABASE_URL` with scoped role).
+
+---
+
 ## 2026-06-10 21:30
 
 **What changed:** Phases 4 and 5 complete — D3 blast-radius graph, full narrative layer, FSMA 204 table, readiness checklist
