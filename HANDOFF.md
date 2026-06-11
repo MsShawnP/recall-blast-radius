@@ -1,5 +1,17 @@
 # HANDOFF — recall-blast-radius
 
+## 2026-06-11 16:00
+
+**What changed:** Phase 7 portfolio card added to lailara-website + FSMA 204 cross-link
+
+**Why:** Phase 7 deliverable — "Risk & Traceability" engagement card on /work page links to recall.lailarallc.com; FSMA 204 pillar page now references the 47× Scenario B figure in "Where brands actually fail."
+
+**State:** Card committed to lailara-website (c3b833b), not yet pushed/deployed. recall.lailarallc.com SSL still pending verification. LinkedIn post not done.
+
+**Next:** Push lailara-website and verify card live at lailarallc.com/work. Then LinkedIn Scenario B screen capture post.
+
+---
+
 ## 2026-06-11 15:30 (wrap)
 
 **Started from:** `fly deploy` blocked — `psycopg2-binary==2.9.9` has no Python 3.13 wheel, failing at pip install in Docker.
