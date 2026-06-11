@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+*.egg-info/
+
+# Pipeline — only graph.py and cache/ go into the image
+pipeline/generate_genealogy.py
+pipeline/seed.py
+pipeline/assets.py
+pipeline/__pycache__/
+
+# dbt / data
+data/
+.dbt/
+
+# Environment
+.env
+.env.*
+!.env.example
+*.key
+credentials.*
+
+# Frontend (not served by the API)
+frontend/
+
+# Dev tooling
+docker-compose.yml
+.claude/
+
+# Git
+.git/
+.gitignore
+
+# Docs
+*.md
+brief_*.md

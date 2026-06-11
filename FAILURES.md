@@ -71,3 +71,39 @@ Approaches that didn't work and why. Read before repeating.
 **Lesson:** For generators and data pipelines, write the skeleton → run it with n=10 → verify counts and shape → then scale up. "Write then run" loses cheap feedback from the first run.
 
 **Tags:** process, generators
+
+---
+
+## 2026-06-11 — import.meta.env is a Vite bundler pattern, not a browser primitive
+
+**What failed:** `const API_BASE = import.meta.env?.VITE_API_BASE ?? 'http://localhost:8000/api'` — in a plain static site with no bundler, `import.meta.env` is always `undefined` at runtime. The `??` fallback to localhost always fired, so production would silently hit the local API instead of Fly.io.
+
+**Why:** Pattern copied from Vite project conventions. Without a build step, the bundler never replaces `import.meta.env.VITE_API_BASE` with the actual value.
+
+**Fix:** For no-build static sites, use hostname detection: `const LOCAL = ['localhost','127.0.0.1'].includes(window.location.hostname); const API_BASE = LOCAL ? '...' : '...'`. Zero config, works everywhere.
+
+**Tags:** frontend, deployment, static-site, vite, api-url
+
+---
+
+## 2026-06-11 — wrangler pages domain add does not exist in wrangler v4
+
+**What failed:** `npx wrangler pages domain add recall-blast-radius recall.lailarallc.com` — command not found. Wrangler v4 has no `pages domain` subcommand.
+
+**Why:** Docs or memory from an older wrangler version. The `pages` command group in v4 only has: `dev`, `functions`, `project`, `deployment`, `deploy`, `secret`, `download`.
+
+**Fix:** Use the Cloudflare REST API directly: `POST /accounts/{id}/pages/projects/{name}/domains` with `{"name": "recall.lailarallc.com"}`. Requires `CLOUDFLARE_API_TOKEN` env var (already available). Then create the CNAME DNS record separately via `POST /zones/{zone_id}/dns_records`.
+
+**Tags:** cloudflare, wrangler, deployment, custom-domain
+
+---
+
+## 2026-06-11 — wrangler pages deploy fails on dirty working tree without flag
+
+**What failed:** `npx wrangler pages deploy frontend --project-name recall-blast-radius` exited with an error when the working tree had uncommitted changes.
+
+**Why:** Wrangler treats a dirty git working tree as an error by default (it wants a clean source association).
+
+**Fix:** Pass `--commit-dirty=true` to override: `npx wrangler pages deploy frontend --project-name recall-blast-radius --commit-dirty=true`.
+
+**Tags:** cloudflare, wrangler, deployment, git

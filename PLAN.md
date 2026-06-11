@@ -1,13 +1,13 @@
 # PLAN — recall-blast-radius
 
 **Tier:** Heavy (new product, Cinderhaven extension, regulatory domain)
-**Status:** Phase 3 complete — Phase 4 next (D3 frontend)
+**Status:** Phase 6 mostly complete — recall.lailarallc.com SSL pending, Dagster integration deferred. Phase 7 next.
 
 ---
 
 ## Current Focus
 
-Phase 6 — Deployment (Fly.io FastAPI, Cloudflare Pages, recall.lailarallc.com).
+Phase 7 — Portfolio integration (engagement card + LinkedIn post). Verify recall.lailarallc.com SSL active first.
 
 ---
 
@@ -66,11 +66,11 @@ Phase 6 — Deployment (Fly.io FastAPI, Cloudflare Pages, recall.lailarallc.com)
 - [x] Traceability readiness checklist (10 questions)
 - [ ] PDF export — deferred to Phase 6
 
-### Phase 6 — Deployment
-- [ ] Fly.io: FastAPI deploy
-- [ ] Cloudflare Pages: frontend deploy
-- [ ] recall.lailarallc.com subdomain
-- [ ] Dagster asset integration
+### Phase 6 — Deployment ✅ MOSTLY DONE (2026-06-11)
+- [x] Fly.io: FastAPI deploy — live at https://recall-blast-radius.fly.dev
+- [x] Cloudflare Pages: frontend deploy — live at https://recall-blast-radius.pages.dev
+- [x] recall.lailarallc.com subdomain — CNAME set, SSL pending activation
+- [ ] Dagster asset integration — deferred
 
 ### Phase 7 — Portfolio integration
 - [ ] /work engagement card: "Risk & Traceability"

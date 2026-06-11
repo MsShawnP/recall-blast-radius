@@ -1,5 +1,17 @@
 # HANDOFF — recall-blast-radius
 
+## 2026-06-11 15:30 (wrap)
+
+**Started from:** `fly deploy` blocked — `psycopg2-binary==2.9.9` has no Python 3.13 wheel, failing at pip install in Docker.
+
+**Did:** Fixed psycopg2 version (2.9.9→2.9.10, has cp313 manylinux wheel). Deployed FastAPI to Fly.io. Fixed `API_BASE` (was dead Vite env var pattern — replaced with hostname detection). Deployed frontend to Cloudflare Pages. Added `recall.lailarallc.com` custom domain + CNAME via Cloudflare API. Pushed to GitHub.
+
+**State:** API live at `https://recall-blast-radius.fly.dev/api/scenarios` ✅. Frontend live at `https://recall-blast-radius.pages.dev` ✅. `recall.lailarallc.com` CNAME set, SSL cert pending ⏳. Dagster asset integration not done. Known data bug: `cases_sold_through > cases_in_channel` (display-clamped, dbt not fixed).
+
+**Next:** Verify `recall.lailarallc.com` active (`curl -I https://recall.lailarallc.com`). Then Phase 7: portfolio engagement card + LinkedIn post with Scenario B screen capture.
+
+---
+
 ## 2026-06-10 22:00 (wrap)
 
 **Started from:** Phase 4 code written but untested; `build_cache.py` just written; Phase 5 not started.

@@ -100,6 +100,24 @@
 
 ---
 
+## D-013 — Use Cloudflare REST API (not wrangler) for Pages custom domains
+
+**Decision:** Add custom domains to Cloudflare Pages projects via the REST API, not wrangler CLI. Create the CNAME DNS record explicitly as a second call.
+
+**Date:** 2026-06-11
+
+**Why:** `wrangler pages domain add` does not exist in wrangler v4. The REST API works reliably with `CLOUDFLARE_API_TOKEN` already in the environment.
+
+**Scope:** All Lailara Cloudflare Pages projects needing a custom subdomain.
+
+**Do not:** Attempt `wrangler pages domain *` — the subcommand doesn't exist. Also: CNAME is not auto-provisioned by the Pages domain-add API call even on same-account zones — always create it explicitly via `POST /zones/{zone_id}/dns_records` with `"proxied": true`.
+
+**Endpoints:**
+- Add domain: `POST /accounts/{account_id}/pages/projects/{name}/domains` `{"name":"sub.lailarallc.com"}`
+- Add CNAME: `POST /zones/{zone_id}/dns_records` `{"type":"CNAME","name":"sub","content":"{name}.pages.dev","proxied":true,"ttl":1}`
+
+---
+
 ## D-008 — Genealogy schema placement
 **Decision:** Standalone Postgres in this repo (docker-compose). Includes stub platform tables (product_master, retailers, shipments) seeded from canonical values, plus new `genealogy` schema tables.  
 **Rationale:** Portfolio piece must run standalone without a live connection to cinderhaven-data-platform on Fly.io. SKU IDs and retailer IDs are canonical-conformant (50 SKUs, 6 retailers) so downstream reconciliation is possible if integrated later.  
