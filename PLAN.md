@@ -1,13 +1,13 @@
 # PLAN — recall-blast-radius
 
 **Tier:** Heavy (new product, Cinderhaven extension, regulatory domain)
-**Status:** Phase 2 complete — Phase 3 next (FastAPI)
+**Status:** Phase 3 complete — Phase 4 next (D3 frontend)
 
 ---
 
 ## Current Focus
 
-Phase 3 — FastAPI traversal API (/trace, /scenarios, /lots endpoints).
+Phase 4 — D3 visualization (force/hierarchical graph, scope panel, scenario switcher).
 
 ---
 
@@ -43,12 +43,12 @@ Phase 3 — FastAPI traversal API (/trace, /scenarios, /lots endpoints).
 - [x] Aggregation strategy for large graphs (collapse shipments → direct fg_lot→retailer edges >60 nodes)
 - [ ] Node aggregation / collapsible levels for D3 — deferred to Phase 4 (frontend)
 
-### Phase 3 — FastAPI traversal API
-- [ ] POST /trace — given a lot_id and direction, return graph + scope
-- [ ] GET /scenarios — return preset scenario graphs
-- [ ] GET /lots — search/list available lots
-- [ ] Health endpoint
-- [ ] Dockerfile for Fly.io
+### Phase 3 — FastAPI traversal API ✅ DONE (2026-06-10)
+- [x] POST /trace — given a lot_id and direction, return graph + scope
+- [x] GET /scenarios — return preset scenario graphs
+- [x] GET /lots — search/list available lots
+- [x] Health endpoint
+- [ ] Dockerfile for Fly.io — deferred to Phase 6
 
 ### Phase 4 — D3 visualization
 - [ ] Force/hierarchical layout for blast-radius graph
