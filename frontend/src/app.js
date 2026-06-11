@@ -1,6 +1,7 @@
 import { renderGraph } from './graph.js';
 
-const API_BASE = import.meta.env?.VITE_API_BASE ?? 'http://localhost:8000/api';
+const LOCAL = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+const API_BASE = LOCAL ? 'http://localhost:8000/api' : 'https://recall-blast-radius.fly.dev/api';
 
 let scenarioCache = null;
 let currentId = 'A';
