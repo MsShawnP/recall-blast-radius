@@ -7,7 +7,7 @@
 
 ## Current Focus
 
-Phase 5 — Narrative and content (hook copy, scenario narrative, FSMA 204 KDE/CTE table, checklist).
+Phase 6 — Deployment (Fly.io FastAPI, Cloudflare Pages, recall.lailarallc.com).
 
 ---
 
@@ -58,12 +58,13 @@ Phase 5 — Narrative and content (hook copy, scenario narrative, FSMA 204 KDE/C
 - [ ] Node collapse/expand for large graphs — deferred (preset scenarios are bounded in size)
 - [x] Mobile layout (responsive CSS, 380px SVG on mobile)
 
-### Phase 5 — Narrative and content
-- [ ] Part 1: hook copy ("It's 2pm Friday...")
-- [ ] Part 2: scenario narrative (B is the gut-punch)
-- [ ] Part 3: FSMA 204 KDE/CTE mapping table
-- [ ] Traceability readiness checklist (page + PDF)
-- [ ] Margin math copy (Scenario B cost vs. Cinderhaven net income)
+### Phase 5 — Narrative and content ✅ DONE (2026-06-10)
+- [x] Part 1: hook copy ("It's 2pm Friday..." + $10M+ stat + insight)
+- [x] Part 2: scenario narrative (Scenario B gut-punch — 47× blast radius from shared lot)
+- [x] Margin math copy ($52K–$81K retrieval vs $10M+ full recall vs ~$2.75M EBITDA)
+- [x] Part 3: FSMA 204 KDE/CTE mapping table (Receiving / Transformation / Shipping, 17 KDEs)
+- [x] Traceability readiness checklist (10 questions)
+- [ ] PDF export — deferred to Phase 6
 
 ### Phase 6 — Deployment
 - [ ] Fly.io: FastAPI deploy

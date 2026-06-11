@@ -13,6 +13,7 @@
   </header>
 
   <main class="content">
+
     <!-- Part 1: Hook -->
     <section class="hook" id="hook">
       <h1 class="chart-title">It's 2pm Friday. Your tomato supplier just called.</h1>
@@ -32,6 +33,7 @@
 
     <!-- Part 2: Interactive blast radius -->
     <section class="interactive" id="blast-radius">
+      <h2 class="chart-title">The blast radius depends entirely on how your lots are linked</h2>
       <div class="scenario-switcher">
         <button class="scenario-btn active" data-scenario="A">Scenario A</button>
         <button class="scenario-btn" data-scenario="B">Scenario B</button>
@@ -39,17 +41,300 @@
       </div>
       <div class="blast-layout">
         <div id="graph-container"></div>
-        <aside id="scope-panel">
-          <!-- Scope panel: units, sold-through, cost, notification list -->
-        </aside>
+        <aside id="scope-panel"></aside>
+      </div>
+    </section>
+
+    <!-- Scenario B narrative — the gut-punch -->
+    <section class="narrative" id="scenario-b-narrative">
+      <h2 class="chart-title">Scenario B is not a bigger version of Scenario A</h2>
+      <div class="narrative-cols">
+        <div class="narrative-col">
+          <p class="narrative-body">
+            Scenario A is containable. One ingredient lot, one production batch, three retailers.
+            You can run that recall in a day with a spreadsheet. The product cost is low. The
+            notification list is short. This is the scenario brands imagine when they think
+            "recall."
+          </p>
+          <p class="narrative-body">
+            Scenario B is what actually happens when a shared-ingredient lot touches multiple
+            production runs. The same chili flakes lot went into your hot sauce on Monday,
+            your spice blend on Wednesday, and your seasoning mix the following week — because
+            your co-manufacturer ran three separate batches from the same pallet.
+          </p>
+        </div>
+        <div class="narrative-col">
+          <p class="narrative-body">
+            The result: 23 affected lots, 14 SKUs across five product lines, 6 retailers to
+            notify, 5,785 cases still in channel. That is 47× the blast radius of Scenario A —
+            from one shared ingredient lot.
+          </p>
+          <p class="narrative-insight">
+            The difference between Scenario A and Scenario B is not ingredient risk. It's
+            whether you know, at the moment the call comes in, which batches shared that lot.
+            Most brands don't know. The genealogy data isn't there.
+          </p>
+        </div>
+      </div>
+
+      <div class="margin-math">
+        <div class="margin-math__col">
+          <div class="margin-math__label">Scenario B — product retrieval cost</div>
+          <div class="margin-math__value">$52K–$81K</div>
+          <div class="margin-math__sub">cases recalled × avg. case value</div>
+        </div>
+        <div class="margin-math__divider">vs.</div>
+        <div class="margin-math__col">
+          <div class="margin-math__label">Full recall — industry average</div>
+          <div class="margin-math__value">$10M+</div>
+          <div class="margin-math__sub">product retrieval + logistics + testing + legal + PR + shelf recovery</div>
+        </div>
+        <div class="margin-math__divider">against</div>
+        <div class="margin-math__col">
+          <div class="margin-math__label">Cinderhaven annual EBITDA (est.)</div>
+          <div class="margin-math__value">~$2.75M</div>
+          <div class="margin-math__sub">11% EBITDA × $25M revenue — a full recall wipes out 3+ years</div>
+        </div>
       </div>
     </section>
 
     <!-- Part 3: Evidence -->
     <section class="evidence" id="evidence">
+
       <!-- FSMA 204 KDE/CTE mapping table -->
-      <!-- Readiness checklist -->
+      <div class="evidence-block">
+        <h2 class="chart-title">FSMA 204 compliance — July 20, 2028</h2>
+        <p class="evidence-intro">
+          Section 204 of the Food Safety Modernization Act requires traceability records for
+          high-risk foods at each Critical Tracking Event (CTE). The table below maps FDA's
+          required Key Data Elements (KDEs) against the data Cinderhaven already captures.
+          The blast-radius graph above is built from these same records.
+        </p>
+
+        <div class="kde-table-wrap">
+          <table class="kde-table">
+            <thead>
+              <tr>
+                <th>CTE</th>
+                <th>FDA KDE</th>
+                <th>Cinderhaven record</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="kde-table__group-header">
+                <td colspan="4">Receiving (ingredient lots)</td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Traceability lot code (TLC)</td>
+                <td><code>ingredient_lot_id</code></td>
+                <td><span class="kde-status kde-status--pass">Captured</span></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Commodity / product description</td>
+                <td><code>ingredients.name</code></td>
+                <td><span class="kde-status kde-status--pass">Captured</span></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Quantity and unit of measure</td>
+                <td><code>quantity_kg</code></td>
+                <td><span class="kde-status kde-status--pass">Captured</span></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Supplier / shipper location</td>
+                <td><code>supplier_id</code></td>
+                <td><span class="kde-status kde-status--pass">Captured</span></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Receipt date</td>
+                <td><code>received_date</code></td>
+                <td><span class="kde-status kde-status--pass">Captured</span></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Reference document (BOL / PO)</td>
+                <td>—</td>
+                <td><span class="kde-status kde-status--warn">Planned</span></td>
+              </tr>
+
+              <tr class="kde-table__group-header">
+                <td colspan="4">Transformation (production batches)</td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>New TLC assigned</td>
+                <td><code>fg_lot_id</code></td>
+                <td><span class="kde-status kde-status--pass">Captured</span></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Input TLCs used</td>
+                <td><code>batch_ingredient_map</code></td>
+                <td><span class="kde-status kde-status--pass">Captured</span></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Transformation date</td>
+                <td><code>production_date</code></td>
+                <td><span class="kde-status kde-status--pass">Captured</span></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Location of transformation</td>
+                <td><code>co_packers.name</code></td>
+                <td><span class="kde-status kde-status--pass">Captured</span></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Product description (output)</td>
+                <td><code>products.sku_id</code></td>
+                <td><span class="kde-status kde-status--pass">Captured</span></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Quantity (output)</td>
+                <td><code>units_produced</code></td>
+                <td><span class="kde-status kde-status--pass">Captured</span></td>
+              </tr>
+
+              <tr class="kde-table__group-header">
+                <td colspan="4">Shipping (finished goods lots)</td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>TLC shipped</td>
+                <td><code>shipment_lot_id</code></td>
+                <td><span class="kde-status kde-status--pass">Captured</span></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Quantity and unit of measure</td>
+                <td><code>cases_shipped</code></td>
+                <td><span class="kde-status kde-status--pass">Captured</span></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Recipient name and location</td>
+                <td><code>retailers.name</code></td>
+                <td><span class="kde-status kde-status--pass">Captured</span></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Ship date</td>
+                <td><code>ship_date</code></td>
+                <td><span class="kde-status kde-status--pass">Captured</span></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>Reference document (BOL)</td>
+                <td>—</td>
+                <td><span class="kde-status kde-status--warn">Planned</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="evidence-footnote">
+          FSMA 204 compliance deadline: July 20, 2028 (FR Doc. 2025-14967 + Continuing
+          Appropriations Act of 2026). Applies to FDA-regulated foods on the Food Traceability
+          List (FTL). Hot sauces and spice blends are not on the current FTL; upstream fresh
+          ingredients may trigger requirements at the receiving CTE.
+        </p>
+      </div>
+
+      <!-- Traceability readiness checklist -->
+      <div class="evidence-block">
+        <h2 class="chart-title">Traceability readiness — ten questions</h2>
+        <p class="evidence-intro">
+          Most small food brands cannot answer all ten of these questions in under an hour.
+          A brand that can is ready for FSMA 204 and for the Friday 2pm call.
+        </p>
+
+        <div class="checklist">
+          <div class="checklist-item">
+            <span class="checklist-num">01</span>
+            <div class="checklist-content">
+              <div class="checklist-q">Can you produce a complete lot genealogy within 24 hours?</div>
+              <div class="checklist-detail">FDA expects records on demand. "We're pulling it together" is not a defensible answer.</div>
+            </div>
+          </div>
+          <div class="checklist-item">
+            <span class="checklist-num">02</span>
+            <div class="checklist-content">
+              <div class="checklist-q">Do you capture ingredient lot codes at every receiving event?</div>
+              <div class="checklist-detail">If your receiving dock logs "chili flakes from Supplier A" but not the specific lot code, you cannot trace forward.</div>
+            </div>
+          </div>
+          <div class="checklist-item">
+            <span class="checklist-num">03</span>
+            <div class="checklist-content">
+              <div class="checklist-q">Do your co-manufacturers provide batch records that link input lot codes to output lot codes?</div>
+              <div class="checklist-detail">This is the Transformation CTE. It's where most small brands have a gap — the co-packer has the data, but no one ever asked for it.</div>
+            </div>
+          </div>
+          <div class="checklist-item">
+            <span class="checklist-num">04</span>
+            <div class="checklist-content">
+              <div class="checklist-q">Do your finished goods lot codes match what appears on the label?</div>
+              <div class="checklist-detail">Your ERP might track one format; the label says another. FDA traces from the label.</div>
+            </div>
+          </div>
+          <div class="checklist-item">
+            <span class="checklist-num">05</span>
+            <div class="checklist-content">
+              <div class="checklist-q">Can you identify every retailer and distributor that received a specific FG lot?</div>
+              <div class="checklist-detail">Ship-to records at the case-lot level — not just the order or the SKU. Distributor breaks into sub-lots that need to be tracked separately.</div>
+            </div>
+          </div>
+          <div class="checklist-item">
+            <span class="checklist-num">06</span>
+            <div class="checklist-content">
+              <div class="checklist-q">Do you know which lots are still in channel vs. sold through?</div>
+              <div class="checklist-detail">You can't scope a recall without this. Sell-through velocity by retailer tells you which cases are retrievable vs. already consumed.</div>
+            </div>
+          </div>
+          <div class="checklist-item">
+            <span class="checklist-num">07</span>
+            <div class="checklist-content">
+              <div class="checklist-q">If one ingredient lot was used across multiple production runs, do you know which ones?</div>
+              <div class="checklist-detail">This is Scenario B. The answer determines whether your recall is $52K or $10M.</div>
+            </div>
+          </div>
+          <div class="checklist-item">
+            <span class="checklist-num">08</span>
+            <div class="checklist-content">
+              <div class="checklist-q">Is your traceability data in a system, or in spreadsheets scattered across three inboxes?</div>
+              <div class="checklist-detail">FDA can request records going back two years. "We think we have it on Dropbox" fails the test.</div>
+            </div>
+          </div>
+          <div class="checklist-item">
+            <span class="checklist-num">09</span>
+            <div class="checklist-content">
+              <div class="checklist-q">Do you have a recall SOP that names the data systems, the record owners, and the 24-hour response plan?</div>
+              <div class="checklist-detail">The SOP doesn't run the recall — but it determines how fast you can. Every hour of delay widens the blast radius.</div>
+            </div>
+          </div>
+          <div class="checklist-item">
+            <span class="checklist-num">10</span>
+            <div class="checklist-content">
+              <div class="checklist-q">Have you run a mock trace in the last 12 months?</div>
+              <div class="checklist-detail">A trace drill — pick a lot code, run it forward, produce the full notification list — is the only way to verify the system works before the real call comes.</div>
+            </div>
+          </div>
+        </div>
+
+        <p class="evidence-footnote">
+          Data for this tool uses seed=400 (Cinderhaven Provisions genealogy, synthetic).
+          Recall cost floor: Deloitte/GMA/FMI (2010), conservative. FSMA 204 deadline: July 20, 2028.
+        </p>
+      </div>
+
     </section>
+
   </main>
 
   <script src="https://d3js.org/d3.v7.min.js"></script>

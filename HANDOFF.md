@@ -15,7 +15,17 @@
 
 **To start dev:** `flyctl proxy 5432 -a cinderhaven-db` → `python -m uvicorn api.main:app --reload` → `python -m http.server 3000 --directory frontend`
 
-**Next:** Phase 5 — scenario narrative copy (B is the gut-punch), FSMA 204 KDE/CTE table, traceability readiness checklist.
+**Next:** Phase 6 — Fly.io FastAPI deploy + Cloudflare Pages frontend + recall.lailarallc.com subdomain.
+
+---
+
+## 2026-06-10 (Phase 5 complete)
+
+**Did:** Full narrative and evidence layer — Scenario B gut-punch copy (47× blast radius from one shared lot), margin math ($52K–$81K retrieval vs $10M+ industry average vs ~$2.75M Cinderhaven EBITDA), FSMA 204 KDE/CTE mapping table (Receiving/Transformation/Shipping, 17 KDEs, 2 "Planned" gaps: BOL reference docs), 10-question traceability readiness checklist. All verified in preview.
+
+**State:** Phases 0–5 complete. Frontend is fully functional (API + D3 graph + narrative). Ready for deployment.
+
+**To start dev:** `flyctl proxy 5432 -a cinderhaven-db` → `python -m uvicorn api.main:app --reload` → `python -m http.server 3000 --directory frontend`
 
 ---
 
