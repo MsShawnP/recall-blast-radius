@@ -73,7 +73,7 @@ Phase 7 — Portfolio integration (engagement card + LinkedIn post). Verify reca
 - [ ] Dagster asset integration — deferred
 
 ### Phase 7 — Portfolio integration
-- [ ] /work engagement card: "Risk & Traceability"
+- [x] /work engagement card: "Risk & Traceability" — committed to lailara-website (c3b833b), push pending
 - [ ] LinkedIn post: shared-ingredient scenario screen capture
 
 ---

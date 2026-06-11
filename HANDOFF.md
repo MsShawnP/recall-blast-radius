@@ -1,5 +1,17 @@
 # HANDOFF — recall-blast-radius
 
+## 2026-06-11 16:15 (wrap)
+
+**Started from:** Phase 6 wrapped and deployed. Phase 7 next: portfolio card on /work + LinkedIn post.
+
+**Did:** Added "The Blast Radius — Recall Traceability" engagement card to lailara-website `/work/page.tsx` (`engagements` array, `external: true` → recall.lailarallc.com). Added cross-link paragraph to `fsma-204/page.tsx` "Where brands actually fail" section (47× figure, same inline link pattern as Product Data Health Audit). Committed to lailara-website (`c3b833b`).
+
+**State:** Card committed locally in lailara-website, not yet pushed. recall.lailarallc.com SSL still pending. LinkedIn post not done. lailara-website 19 commits ahead of origin.
+
+**Next:** Push lailara-website and verify card live at lailarallc.com/work. Verify recall.lailarallc.com active (`curl -I https://recall.lailarallc.com`). Then LinkedIn Scenario B screen capture post.
+
+---
+
 ## 2026-06-11 16:00
 
 **What changed:** Phase 7 portfolio card added to lailara-website + FSMA 204 cross-link

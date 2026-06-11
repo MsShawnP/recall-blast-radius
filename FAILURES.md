@@ -4,6 +4,18 @@ Approaches that didn't work and why. Read before repeating.
 
 ---
 
+## 2026-06-11 — Filesystem search for lailara-website repo was slow
+
+**What failed:** Multiple `find` / `glob` / `grep` searches across `projects/active`, `projects/published`, and `projects/reference` to locate the lailara-website source. Took several rounds before finding it at `C:\Users\mssha\projects\reference\lailara-website\site`.
+
+**Why:** The repo lives in `reference/`, not `active/` or `published/`, which isn't the natural search order.
+
+**Fix:** Use `gh repo list MsShawnP` first when looking for any repo — name is instantly visible and avoids filesystem iteration.
+
+**Tags:** workflow, repo-discovery, lailara-website
+
+---
+
 ## 2026-06-10 — O(n²) BOM lookup in generate_genealogy.py
 
 **What failed:** The batch loop that finds ingredient lots received before a batch's production date re-indexes the full `records["ingredient_lots"]` list on every iteration via a list comprehension index lookup — O(n²) over ~1,200 lots × ~600 batches = ~720K operations.

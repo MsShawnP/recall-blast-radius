@@ -2,6 +2,20 @@
 
 ---
 
+## D-014 — lailara-website repo location for portfolio work
+
+**Decision:** The lailara-website Next.js source is at `C:\Users\mssha\projects\reference\lailara-website\site`. Use `gh repo list MsShawnP` to locate any repo, not filesystem search.
+
+**Date:** 2026-06-11
+
+**Why:** Repo lives in `reference/`, not `active/` or `published/`. Filesystem searches iterated through all three before finding it.
+
+**Scope:** Any session that touches the main website (portfolio cards, pillar pages, nav, global layout).
+
+**Do not:** Search with `find` or `glob` for the website source — use `gh repo list` then check `reference/lailara-website/site`.
+
+---
+
 ## D-001 — FSMA 204 compliance date to cite in the piece
 **Decision:** July 20, 2028  
 **Date:** 2026-06-10  
