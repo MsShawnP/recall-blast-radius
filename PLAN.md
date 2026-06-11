@@ -1,13 +1,13 @@
 # PLAN — recall-blast-radius
 
 **Tier:** Heavy (new product, Cinderhaven extension, regulatory domain)
-**Status:** Phase 1 complete — Phase 2 in progress
+**Status:** Phase 2 complete — Phase 3 next (FastAPI)
 
 ---
 
 ## Current Focus
 
-Phase 2 — Graph construction (NetworkX graph from fct_blast_radius + parent_id).
+Phase 3 — FastAPI traversal API (/trace, /scenarios, /lots endpoints).
 
 ---
 
@@ -35,13 +35,13 @@ Phase 2 — Graph construction (NetworkX graph from fct_blast_radius + parent_id
 - [x] Register seed=400 in CINDERHAVEN_CANONICAL.md — **TODO: do this in cinderhaven-data-platform**
 - [x] Run end-to-end: docker compose up → generate_genealogy → dbt run → verify counts
 
-### Phase 2 — Graph construction
-- [ ] Python: build NetworkX graph from genealogy mart
-- [ ] Implement trace-forward traversal (lot → cases in channel)
-- [ ] Implement scope computation (units, sold-through estimate, cost model)
-- [ ] Generate three preset scenario graphs (A: single lot, B: shared ingredient, C: packaging lot)
-- [ ] Aggregation strategy for large graphs (collapse store level into counts)
-- [ ] Node aggregation / collapsible levels for D3
+### Phase 2 — Graph construction ✅ DONE (2026-06-10)
+- [x] Python: build NetworkX graph from genealogy mart
+- [x] Implement trace-forward traversal (lot → cases in channel)
+- [x] Implement scope computation (units, sold-through estimate, cost model)
+- [x] Generate three preset scenario graphs (A: single lot, B: shared ingredient, C: packaging lot)
+- [x] Aggregation strategy for large graphs (collapse shipments → direct fg_lot→retailer edges >60 nodes)
+- [ ] Node aggregation / collapsible levels for D3 — deferred to Phase 4 (frontend)
 
 ### Phase 3 — FastAPI traversal API
 - [ ] POST /trace — given a lot_id and direction, return graph + scope
