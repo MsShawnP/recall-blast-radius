@@ -7,7 +7,7 @@
 
 ## Current Focus
 
-Phase 4 — D3 visualization (force/hierarchical graph, scope panel, scenario switcher).
+Phase 5 — Narrative and content (hook copy, scenario narrative, FSMA 204 KDE/CTE table, checklist).
 
 ---
 
@@ -50,13 +50,13 @@ Phase 4 — D3 visualization (force/hierarchical graph, scope panel, scenario sw
 - [x] Health endpoint
 - [ ] Dockerfile for Fly.io — deferred to Phase 6
 
-### Phase 4 — D3 visualization
-- [ ] Force/hierarchical layout for blast-radius graph
-- [ ] Click-to-pin detail cards (dark callout, Lailara design system)
-- [ ] Scope panel: units, sold-through, cost range, notification list
-- [ ] Three scenario switcher
-- [ ] Node collapse/expand for large graphs
-- [ ] Mobile layout
+### Phase 4 — D3 visualization ✅ DONE (2026-06-10)
+- [x] Force/hierarchical layout — depth-based Y force, arrow heads, node sizing by type
+- [x] Click-to-pin detail cards (dark callout, Lailara design system, 200ms opacity transition)
+- [x] Scope panel: units, sold-through bar, cost range, notification list
+- [x] Three scenario switcher with API titles + description
+- [ ] Node collapse/expand for large graphs — deferred (preset scenarios are bounded in size)
+- [x] Mobile layout (responsive CSS, 380px SVG on mobile)
 
 ### Phase 5 — Narrative and content
 - [ ] Part 1: hook copy ("It's 2pm Friday...")

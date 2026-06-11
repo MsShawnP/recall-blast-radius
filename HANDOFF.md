@@ -1,5 +1,24 @@
 # HANDOFF — recall-blast-radius
 
+## 2026-06-10 (Phase 4 complete)
+
+**Started from:** Phases 0-3 done. Phase 4 (D3 visualization) was next.
+
+**Did:** Complete Phase 4 frontend implementation:
+- `frontend/src/graph.js` — full rewrite: depth-based Y force layering (ingredient→batch→fg_lot→shipment→retailer top-to-bottom), arrow-head directed edges (pre-shortened line endpoints), node sizing by type (ingredient/packaging 14px, retailer 12px, batch/fg_lot 10px, shipment 7px), click-to-pin with 200ms D3 opacity transition + dark callout card, node type legend
+- `frontend/src/app.js` — full rewrite: scenario cache (single fetch), renderScenarioMeta (title + description below switcher), full scope panel (cases_in_channel, cases_sold_through + %, lots, SKUs, cost range, notification_list), `.graph-error` state for API-down
+- `frontend/src/styles.css` — expanded (external pass added hook/loading/error classes, sticky scope panel, overflow:hidden on graph container)
+
+**State:** Phase 4 complete and verified. All 3 scenarios render against live API (Fly proxy + uvicorn + `pipeline/cache/scenario_graphs.json`). Scenario A: 9 nodes, 121 cases. Scenario B: 53 nodes, 5,785 cases, 6 retailers to notify. Scenario C: 443 nodes (aggregated), 54,576 cases, $491K–$764K cost. Scope panel, legend, click-to-pin all working.
+
+**Known data issue:** `cases_sold_through` > `cases_in_channel` in `fct_blast_radius_scope` estimate logic — display clamped to 100%; underlying dbt model bug to fix separately.
+
+**To start dev:** `flyctl proxy 5432 -a cinderhaven-db` → `python -m uvicorn api.main:app --reload` → `python -m http.server 3000 --directory frontend`
+
+**Next:** Phase 5 — scenario narrative copy (B is the gut-punch), FSMA 204 KDE/CTE table, traceability readiness checklist.
+
+---
+
 ## 2026-06-10 18:30
 
 **Started from:** Brand new project. Only `brief_recall_blast_radius.md` existed.
