@@ -1,13 +1,13 @@
 # PLAN — recall-blast-radius
 
 **Tier:** Heavy (new product, Cinderhaven extension, regulatory domain)
-**Status:** Phases 1–6 complete (recall.lailarallc.com live, SSL verified 2026-06-12; Dagster integration deferred). Phase 7: card shipped; LinkedIn post drafted, posting is yours.
+**Status:** Phases 1–7 complete (recall.lailarallc.com live, SSL verified 2026-06-12; Dagster integration deferred). Social/marketing posts handled outside CC.
 
 ---
 
 ## Current Focus
 
-Phase 7 — Portfolio integration (engagement card + LinkedIn post). Verify recall.lailarallc.com SSL active first.
+Phase 7 complete. No pending CC work.
 
 ---
 
@@ -73,9 +73,8 @@ Phase 7 — Portfolio integration (engagement card + LinkedIn post). Verify reca
 - [x] App-tier unit tests — 16 tests: graph construction, subgraph extraction, shipment aggregation, scope panel mapping, API routing/validation paths (2026-06-12)
 - [ ] Dagster asset integration — deferred
 
-### Phase 7 — Portfolio integration
+### Phase 7 — Portfolio integration ✅ DONE (2026-06-12)
 - [x] /work engagement card: "Risk & Traceability" — committed to lailara-website (c3b833b), pushed 2026-06-12
-- [ ] LinkedIn post: draft in docs/linkedin-post-draft.md (2026-06-12) — review, capture the Scenario B screen, post manually
 
 ---
 

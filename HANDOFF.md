@@ -2,13 +2,13 @@
 
 ## 2026-06-11 16:15 (wrap)
 
-**Started from:** Phase 6 wrapped and deployed. Phase 7 next: portfolio card on /work + LinkedIn post.
+**Started from:** Phase 6 wrapped and deployed. Phase 7 next: portfolio card on /work.
 
 **Did:** Added "The Blast Radius — Recall Traceability" engagement card to lailara-website `/work/page.tsx` (`engagements` array, `external: true` → recall.lailarallc.com). Added cross-link paragraph to `fsma-204/page.tsx` "Where brands actually fail" section (47× figure, same inline link pattern as Product Data Health Audit). Committed to lailara-website (`c3b833b`).
 
-**State:** Card committed locally in lailara-website, not yet pushed. recall.lailarallc.com SSL still pending. LinkedIn post not done. lailara-website 19 commits ahead of origin.
+**State:** Card committed locally in lailara-website, not yet pushed. recall.lailarallc.com SSL still pending. lailara-website 19 commits ahead of origin.
 
-**Next:** Push lailara-website and verify card live at lailarallc.com/work. Verify recall.lailarallc.com active (`curl -I https://recall.lailarallc.com`). Then LinkedIn Scenario B screen capture post.
+**Next:** Push lailara-website and verify card live at lailarallc.com/work. Verify recall.lailarallc.com active (`curl -I https://recall.lailarallc.com`).
 
 ---
 
@@ -18,9 +18,9 @@
 
 **Why:** Phase 7 deliverable — "Risk & Traceability" engagement card on /work page links to recall.lailarallc.com; FSMA 204 pillar page now references the 47× Scenario B figure in "Where brands actually fail."
 
-**State:** Card committed to lailara-website (c3b833b), not yet pushed/deployed. recall.lailarallc.com SSL still pending verification. LinkedIn post not done.
+**State:** Card committed to lailara-website (c3b833b), not yet pushed/deployed. recall.lailarallc.com SSL still pending verification.
 
-**Next:** Push lailara-website and verify card live at lailarallc.com/work. Then LinkedIn Scenario B screen capture post.
+**Next:** Push lailara-website and verify card live at lailarallc.com/work.
 
 ---
 
@@ -32,7 +32,7 @@
 
 **State:** API live at `https://recall-blast-radius.fly.dev/api/scenarios` ✅. Frontend live at `https://recall-blast-radius.pages.dev` ✅. `recall.lailarallc.com` CNAME set, SSL cert pending ⏳. Dagster asset integration not done. Known data bug: `cases_sold_through > cases_in_channel` (display-clamped, dbt not fixed).
 
-**Next:** Verify `recall.lailarallc.com` active (`curl -I https://recall.lailarallc.com`). Then Phase 7: portfolio engagement card + LinkedIn post with Scenario B screen capture.
+**Next:** Verify `recall.lailarallc.com` active (`curl -I https://recall.lailarallc.com`). Then Phase 7: portfolio engagement card.
 
 ---
 
