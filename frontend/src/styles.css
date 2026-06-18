@@ -237,7 +237,7 @@ body {
   color: #fff;
   font-family: 'Playfair Display', Georgia, serif;
   letter-spacing: -0.02em;
-  line-height: 1;
+  line-height: 1.1;
 }
 .scope-sub {
   font-size: 13px;
@@ -331,7 +331,7 @@ body {
   font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--ink);
-  line-height: 1;
+  line-height: 1.1;
 }
 .hook-stat-label {
   font-size: 15px;
@@ -422,7 +422,7 @@ body {
   font-size: 28px;
   font-weight: 700;
   color: var(--ink);
-  line-height: 1;
+  line-height: 1.1;
   margin-bottom: 6px;
 }
 .margin-math__sub {

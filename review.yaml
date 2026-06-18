@@ -1,0 +1,48 @@
+project: recall-blast-radius
+base_url: https://recall.lailarallc.com
+
+routes:
+  - path: /
+    name: Blast Radius Demo
+
+forbidden_content:
+  - pattern: "TODO|FIXME|HACK|XXX"
+    severity: warning
+    reason: Dev markers in production code
+  - pattern: "password\\s*=|api_key\\s*=|secret\\s*="
+    severity: fail
+    reason: Possible hardcoded credentials
+    exclude:
+      - "*.md"
+
+dom_checks:
+  - route: /
+    elements:
+      - selector: ".site-header"
+        label: Brand header present
+      - selector: "h1.chart-title"
+        label: Hook headline present
+      - selector: ".hook-stat"
+        label: $10M+ stat present
+      - selector: ".scenario-switcher"
+        label: Scenario switcher present
+      - selector: ".scenario-btn"
+        label: Scenario buttons present
+      - selector: "#graph-container"
+        label: Graph container present
+      - selector: "#scope-panel"
+        label: Scope panel present
+      - selector: ".narrative"
+        label: Scenario B narrative present
+      - selector: ".kde-table"
+        label: FSMA 204 KDE table present
+      - selector: ".checklist"
+        label: Readiness checklist present
+    absent:
+      - selector: ".graph-error"
+        label: No API error state shown
+
+layout:
+  - route: /
+    assertions:
+      - type: no_horizontal_scroll
