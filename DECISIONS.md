@@ -2,6 +2,20 @@
 
 ---
 
+## D-015 — Playfair Display minimum line-height for display-size numbers
+
+**Decision:** Set `line-height: 1.1` (minimum) on any Playfair Display element above 20px. Never use `line-height: 1` on large serif text.
+
+**Date:** 2026-06-18
+
+**Why:** Playfair Display's cap-height and descender metrics are taller than web-safe serif fallbacks. `line-height: 1` clips the glyph box at display sizes — confirmed at 64px (4px clip), 36px (2px clip), and 28px (2px clip) in production on recall.lailarallc.com.
+
+**Scope:** All Lailara portfolio pieces and deliverables using Playfair Display for headings, headline numbers, chart titles, or any text above 20px.
+
+**Do not:** Use `line-height: 1` on any Playfair Display element intended to display cleanly in a browser or PDF. For body text (14–17px), the standard `line-height: 1.5–1.6` already covers this.
+
+---
+
 ## D-014 — lailara-website repo location for portfolio work
 
 **Decision:** The lailara-website Next.js source is at `C:\Users\mssha\projects\reference\lailara-website\site`. Use `gh repo list MsShawnP` to locate any repo, not filesystem search.

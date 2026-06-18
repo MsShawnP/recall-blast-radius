@@ -110,6 +110,20 @@ Approaches that didn't work and why. Read before repeating.
 
 ---
 
+## 2026-06-18 — Playfair Display clips at large sizes with line-height: 1
+
+**What failed:** `line-height: 1` on Playfair Display at 64px (`.hook-stat`), 36px (`.scope-headline`), and 28px (`.margin-math__value`) caused visible clipping — 4px overflow on the largest, 2px on the smaller two. ui-review-skill flagged all three as layout FAILs.
+
+**Why:** Playfair Display has taller cap-height and descender metrics than web-safe serifs. `line-height: 1` (exactly the em-square) clips the top and bottom at any size above ~20px.
+
+**Fix:** Set `line-height: 1.1` minimum for any Playfair Display element above 20px. For normal body text the default `1.5` is fine; it's only display-size numbers and headings that need the explicit floor.
+
+**Process sub-failure:** Fixed `.hook-stat` and `.scope-headline` first without grepping for all `line-height: 1` instances — required a second redeploy when `.margin-math__value` also failed. Grep first, fix all at once.
+
+**Tags:** css, typography, playfair-display, ui-review, deployment
+
+---
+
 ## 2026-06-11 — wrangler pages deploy fails on dirty working tree without flag
 
 **What failed:** `npx wrangler pages deploy frontend --project-name recall-blast-radius` exited with an error when the working tree had uncommitted changes.

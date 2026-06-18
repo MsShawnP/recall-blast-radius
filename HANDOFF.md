@@ -1,5 +1,17 @@
 # HANDOFF — recall-blast-radius
 
+## 2026-06-18 (wrap)
+
+**Started from:** Phase 7 done (portfolio card committed, lailara-website not yet pushed). recall.lailarallc.com live, UI review not yet run.
+
+**Did:** Ran ui-review-skill against recall.lailarallc.com. Found 2 CSS overflow fails (`.hook-stat`, `.scope-headline` — Playfair Display 64px/36px with `line-height: 1`). Fixed both, redeployed. Found third fail (`.margin-math__value`, same root cause). Fixed, redeployed. Final: 11 passed, 0 failed, 1 warning (dbt artifact noise). Committed `42389b9`.
+
+**State:** recall.lailarallc.com fully live, UI review clean. API on Fly ✅. lailara-website card committed and pushed — needs redeploy to appear on lailarallc.com/work. 1 review.yaml noise warning (dbt artifact `data/target/**` not excluded).
+
+**Next:** Deploy lailara-website and verify card live at lailarallc.com/work. Then LinkedIn post with Scenario B screen capture (47× blast radius). Optional: add `data/target/**` to review.yaml exclude list.
+
+---
+
 ## 2026-06-11 16:15 (wrap)
 
 **Started from:** Phase 6 wrapped and deployed. Phase 7 next: portfolio card on /work.
