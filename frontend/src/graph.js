@@ -28,6 +28,12 @@ export const NODE_TYPE_LABELS = {
 // Fraction of SVG height for each depth band (0 = root, 4 = retailer)
 const DEPTH_BAND = [0.10, 0.30, 0.50, 0.70, 0.88];
 
+// Below this node count, every node is labeled. At or above it, only the origin
+// root (ingredient lot in A/B, packaging lot in C) and the retailer leaves keep
+// labels; lot/SKU nodes fall back to hover tooltips so dense graphs stay clean.
+const LABEL_THRESHOLD = 25;
+const ALWAYS_LABELED = new Set(['ingredient_lot', 'packaging_lot', 'retailer']);
+
 function targetY(d, height) {
   return (DEPTH_BAND[d.depth ?? 0] ?? 0.88) * height;
 }
@@ -36,10 +42,16 @@ function radius(d) {
   return NODE_RADIUS[d.type] ?? 10;
 }
 
+// Virtual coordinate space the force layout runs in. The viewBox maps this onto
+// whatever pixel box CSS gives the SVG, so nothing here depends on the measured
+// container size — the fit transform below normalizes node positions into it.
+const VIEW_W = 800;
+const VIEW_H = 760;
+
 export function renderGraph(selector, traceResult) {
   const container = document.querySelector(selector);
-  const width     = container.clientWidth || 640;
-  const height    = 520;
+  const width  = VIEW_W;
+  const height = VIEW_H;
   container.innerHTML = '';
 
   // Pin card overlay
@@ -47,12 +59,13 @@ export function renderGraph(selector, traceResult) {
   pinCard.className = 'pin-card pin-card--hidden';
   container.appendChild(pinCard);
 
+  // Responsive SVG: viewBox defines the coordinate space, preserveAspectRatio
+  // keeps the graph centered and uniformly scaled inside whatever box CSS gives
+  // it. Rendered width/height come from CSS, not JS.
   const svg = d3.select(container)
     .append('svg')
-    .attr('width', '100%')
-    .attr('height', height)
     .attr('viewBox', `0 0 ${width} ${height}`)
-    .style('display', 'block');
+    .attr('preserveAspectRatio', 'xMidYMid meet');
 
   // Arrow marker — refX 0 because line endpoints are pre-shortened
   svg.append('defs').append('marker')
@@ -67,6 +80,10 @@ export function renderGraph(selector, traceResult) {
     .attr('d', 'M0,-4L8,0L0,4')
     .attr('fill', '#b3b3b3');
 
+  // Everything that pans/zooms lives in this wrapping <g>. The fit transform
+  // and d3.zoom both write to it.
+  const zoomLayer = svg.append('g').attr('class', 'zoom-layer');
+
   const { nodes, edges } = traceResult;
   const simNodes = nodes.map(n => ({ ...n }));
   // D3 forceLink mutates source/target from string ids to node objects in-place
@@ -77,9 +94,10 @@ export function renderGraph(selector, traceResult) {
     .force('charge',    d3.forceManyBody().strength(-300))
     .force('x',         d3.forceX(width / 2).strength(0.04))
     .force('y',         d3.forceY(d => targetY(d, height)).strength(0.8))
+    // Collision keeps nodes from stacking; padding scales with node radius.
     .force('collision', d3.forceCollide(d => radius(d) + 8));
 
-  const linkSel = svg.append('g').attr('class', 'links')
+  const linkSel = zoomLayer.append('g').attr('class', 'links')
     .selectAll('line')
     .data(simEdges)
     .join('line')
@@ -87,19 +105,31 @@ export function renderGraph(selector, traceResult) {
     .attr('stroke-width', 1.5)
     .attr('marker-end', 'url(#arrowhead)');
 
-  const nodeSel = svg.append('g').attr('class', 'nodes')
+  const nodeSel = zoomLayer.append('g').attr('class', 'nodes')
     .selectAll('circle')
     .data(simNodes)
     .join('circle')
+    .attr('class', 'graph-node')
     .attr('r', d => radius(d))
     .attr('fill', d => NODE_COLORS[d.type] ?? '#595959')
     .attr('stroke', '#f5f3ee')
     .attr('stroke-width', 2)
     .style('cursor', 'pointer');
 
-  const labelSel = svg.append('g').attr('class', 'labels')
+  // Hover tooltip on every node — the only label channel for lot/SKU nodes
+  // once labels are culled in dense graphs.
+  nodeSel.append('title')
+    .text(d => `${NODE_TYPE_LABELS[d.type] ?? d.type}: ${d.label}`);
+
+  // Label culling: always label the ingredient root and the retailers; only
+  // label lot/SKU nodes when the whole graph is small enough to stay clean.
+  const showAllLabels = simNodes.length < LABEL_THRESHOLD;
+  const labelNodes = simNodes.filter(d => ALWAYS_LABELED.has(d.type) || showAllLabels);
+  const labeledSet = new Set(labelNodes);
+
+  const labelSel = zoomLayer.append('g').attr('class', 'labels')
     .selectAll('text')
-    .data(simNodes)
+    .data(labelNodes)
     .join('text')
     .text(d => d.label)
     .attr('font-size', 11)
@@ -109,7 +139,7 @@ export function renderGraph(selector, traceResult) {
     .attr('dx', d => radius(d) + 4)
     .attr('dy', 4);
 
-  simulation.on('tick', () => {
+  function updatePositions() {
     // Shorten line so arrow tip lands at circle edge
     linkSel
       .attr('x1', d => d.source.x)
@@ -127,7 +157,53 @@ export function renderGraph(selector, traceResult) {
       });
     nodeSel.attr('cx', d => d.x).attr('cy', d => d.y);
     labelSel.attr('x', d => d.x).attr('y', d => d.y);
-  });
+  }
+
+  // Run the simulation to a stable layout synchronously, then paint once. This
+  // gives a deterministic bounding box to fit against — no fly-around, and the
+  // graph is contained from the first frame.
+  simulation.stop();
+  const ticks = Math.ceil(Math.log(simulation.alphaMin()) / Math.log(1 - simulation.alphaDecay()));
+  for (let i = 0; i < ticks; i++) simulation.tick();
+  updatePositions();
+  // Keep ticking live so node drag still re-lays-out.
+  simulation.on('tick', updatePositions);
+
+  // Zoom-to-fit: bound all nodes (plus label extent for labeled nodes), scale
+  // to fill the viewport with ~10% padding, and center. d3.zoom then lets the
+  // user pan/zoom from that fitted starting transform.
+  function fitTransform() {
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    simNodes.forEach(d => {
+      const r = radius(d);
+      if (d.x - r < minX) minX = d.x - r;
+      if (d.y - r < minY) minY = d.y - r;
+      if (d.y + r > maxY) maxY = d.y + r;
+      // Labels run to the right of the node; reserve room so they don't clip.
+      const right = labeledSet.has(d) ? d.x + r + 6 + d.label.length * 6 : d.x + r;
+      if (right > maxX) maxX = right;
+    });
+    const bboxW = (maxX - minX) || 1;
+    const bboxH = (maxY - minY) || 1;
+    const scale = Math.min(width / bboxW, height / bboxH) * 0.9;
+    const tx = width / 2 - scale * (minX + maxX) / 2;
+    const ty = height / 2 - scale * (minY + maxY) / 2;
+    return d3.zoomIdentity.translate(tx, ty).scale(scale);
+  }
+
+  const zoom = d3.zoom()
+    .scaleExtent([0.1, 8])
+    .filter(event => {
+      // Wheel always zooms; pointer-drag pans, except when it starts on a node
+      // (that's a node drag) — otherwise grabbing a node would pan the canvas.
+      if (event.type === 'wheel') return !event.button;
+      if (event.target.classList && event.target.classList.contains('graph-node')) return false;
+      return !event.ctrlKey && !event.button;
+    })
+    .on('zoom', event => zoomLayer.attr('transform', event.transform));
+
+  svg.call(zoom);
+  svg.call(zoom.transform, fitTransform());
 
   // Click-to-pin
   let pinned = null;

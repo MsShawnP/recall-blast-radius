@@ -60,6 +60,8 @@ async function loadScenario(id) {
   renderScenarioMeta(scenario);
   renderGraph('#graph-container', scenario.result);
   renderScopePanel(scenario.result);
+  renderComparisonStrip(scenarios);
+  highlightComparison(id);
 }
 
 function renderScenarioMeta(scenario) {
@@ -119,6 +121,67 @@ function renderScopePanel(scenario) {
     ${notifiers.map(r => `<div class="scope-retailer">${r}</div>`).join('')}
     ` : ''}
   `;
+}
+
+// Persistent A/B/C comparison. Built once from the same scope data the metrics
+// panel uses; the active column is re-highlighted on every tab switch.
+function renderComparisonStrip(scenarios) {
+  const el = document.getElementById('comparison-strip');
+  if (!el || el.dataset.built) return;
+
+  const cols = ['A', 'B', 'C']
+    .map(id => scenarios.find(s => s.id === id))
+    .filter(Boolean);
+  if (!cols.length) return;
+
+  const baseCases = cols.find(s => s.id === 'A')?.result.scope.cases_in_channel ?? 0;
+
+  const rows = [
+    { label: 'Cases in channel',    get: s => s.result.scope.cases_in_channel.toLocaleString() },
+    { label: 'Lots',               get: s => s.result.scope.lots_affected.toLocaleString() },
+    { label: 'SKUs',               get: s => s.result.scope.skus_affected.toLocaleString() },
+    { label: 'Retailers to notify', get: s => String((s.result.scope.notification_list ?? []).length) },
+    { label: 'Est. direct cost',   get: s => `${fmt(s.result.scope.cost_low)} – ${fmt(s.result.scope.cost_high)}` },
+    { label: '× vs Scenario A',    mult: true,
+      get: s => multiplierLabel(s.result.scope.cases_in_channel, baseCases) },
+  ];
+
+  el.innerHTML = `
+    <div class="compare-title">All three scenarios, side by side</div>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th class="compare-rowlabel"></th>
+          ${cols.map(s => `
+            <th class="compare-col" data-scenario="${s.id}">
+              <span class="compare-col__id">Scenario ${s.id}</span>
+              <span class="compare-col__title">${s.title}</span>
+            </th>`).join('')}
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map(r => `
+          <tr class="${r.mult ? 'compare-row--mult' : ''}">
+            <td class="compare-rowlabel">${r.label}</td>
+            ${cols.map(s => `<td class="compare-cell" data-scenario="${s.id}">${r.get(s)}</td>`).join('')}
+          </tr>`).join('')}
+      </tbody>
+    </table>
+  `;
+  el.dataset.built = '1';
+}
+
+function highlightComparison(id) {
+  document.querySelectorAll('#comparison-strip [data-scenario]').forEach(cell => {
+    cell.classList.toggle('compare--active', cell.dataset.scenario === id);
+  });
+}
+
+function multiplierLabel(cases, base) {
+  if (!base) return '—';
+  const m = cases / base;
+  if (m === 1) return '1×';
+  return m < 100 ? `${m.toFixed(1)}×` : `${Math.round(m)}×`;
 }
 
 function fmt(n) {
