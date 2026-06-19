@@ -50,7 +50,7 @@ body {
 }
 
 .content {
-  max-width: 900px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 48px 24px;
 }
@@ -320,7 +320,7 @@ body {
 /* ── Hook section ── */
 .hook-body {
   font-size: 17px;
-  max-width: 660px;
+  max-width: 720px;
   color: var(--text-secondary);
   line-height: 1.6;
   margin-bottom: 28px;
@@ -344,7 +344,7 @@ body {
   color: var(--text-secondary);
   border-left: 3px solid var(--gridline);
   padding-left: 16px;
-  max-width: 600px;
+  max-width: 720px;
   line-height: 1.6;
 }
 
@@ -446,7 +446,7 @@ body {
 }
 .evidence-intro {
   font-size: 16px;
-  max-width: 660px;
+  max-width: 720px;
   color: var(--text-secondary);
   line-height: 1.6;
   margin-bottom: 28px;
