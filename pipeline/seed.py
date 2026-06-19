@@ -3,9 +3,7 @@ Standalone loader: apply DDL + seed genealogy data into Postgres.
 Use this instead of the Dagster asset when running without a Dagster instance.
 
 Usage:
-    python pipeline/seed.py
-
-Requires DATABASE_URL env var (or falls back to default local connection).
+    DATABASE_URL=postgresql://... python pipeline/seed.py
 """
 
 import os
@@ -14,11 +12,6 @@ import psycopg2
 from urllib.parse import urlparse, unquote
 from pathlib import Path
 from pipeline.generate_genealogy import generate_all
-
-DATABASE_URL = os.environ.get(
-    "DATABASE_URL",
-    "postgresql://postgres:postgres@localhost:5432/recall_blast_radius"
-)
 
 
 def _parse_url(url):
@@ -175,6 +168,15 @@ def load_data(conn, data):
 
 
 if __name__ == "__main__":
+    database_url = os.environ.get("DATABASE_URL")
+    if not database_url:
+        print(
+            "Error: DATABASE_URL environment variable is required. "
+            "Set it to your Postgres connection string (see .env.example).",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
     # Generate data before opening the DB connection — Fly proxy drops idle connections
     print("Generating seed data...")
     data = generate_all()
@@ -182,7 +184,7 @@ if __name__ == "__main__":
         print(f"  {table}: {len(rows)} rows")
 
     try:
-        conn = psycopg2.connect(**_parse_url(DATABASE_URL))
+        conn = psycopg2.connect(**_parse_url(database_url))
     except Exception as e:
         print(f"DB connection failed: {e}", file=sys.stderr)
         sys.exit(1)

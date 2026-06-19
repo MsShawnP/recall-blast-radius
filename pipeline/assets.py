@@ -1,13 +1,25 @@
 import os
 import psycopg2
+from urllib.parse import urlparse, unquote
 from dagster import asset, AssetExecutionContext
 from pipeline.generate_genealogy import generate_all
 
-DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/recall_blast_radius")
-
 
 def _get_conn():
-    return psycopg2.connect(DATABASE_URL)
+    database_url = os.environ.get("DATABASE_URL")
+    if not database_url:
+        raise RuntimeError(
+            "DATABASE_URL environment variable is required. "
+            "Set it to your Postgres connection string (see .env.example)."
+        )
+    p = urlparse(database_url)
+    return psycopg2.connect(
+        host=p.hostname,
+        port=p.port or 5432,
+        dbname=p.path.lstrip("/"),
+        user=p.username,
+        password=unquote(p.password) if p.password else None,
+    )
 
 
 @asset
