@@ -32,16 +32,16 @@ def genealogy_seed(context: AssetExecutionContext):
     # Platform stubs
     for row in data["retailers"]:
         cur.execute("""
-            INSERT INTO raw.retailers (retailer_id, retailer_name, store_doors)
-            VALUES (%(retailer_id)s, %(retailer_name)s, %(store_doors)s)
+            INSERT INTO raw.retailers (retailer_id, name, store_doors)
+            VALUES (%(retailer_id)s, %(name)s, %(store_doors)s)
             ON CONFLICT (retailer_id) DO NOTHING
         """, row)
 
     for row in data["product_master"]:
         cur.execute("""
-            INSERT INTO raw.product_master (sku_id, sku_name, product_line, cases_per_pallet)
-            VALUES (%(sku_id)s, %(sku_name)s, %(product_line)s, %(cases_per_pallet)s)
-            ON CONFLICT (sku_id) DO NOTHING
+            INSERT INTO raw.product_master (sku, product_name, product_line, cases_per_pallet)
+            VALUES (%(sku)s, %(product_name)s, %(product_line)s, %(cases_per_pallet)s)
+            ON CONFLICT (sku) DO NOTHING
         """, row)
 
     for row in data["shipments"]:

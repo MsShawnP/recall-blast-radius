@@ -49,7 +49,7 @@ sources:
               - not_null
               - relationships:
                   to: source('raw', 'product_master')
-                  field: sku_id
+                  field: sku
           - name: co_packer_id
             tests:
               - not_null
@@ -131,7 +131,7 @@ sources:
     tables:
       - name: product_master
         columns:
-          - name: sku_id
+          - name: sku
             tests: [unique, not_null]
           - name: product_line
             tests:

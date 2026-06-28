@@ -113,7 +113,7 @@ def packaging_lot_rows(conn, packaging_lot_id: str) -> list[tuple]:
                 %(root)s            as root_lot_id,
                 'retailer'          as node_type,
                 r.retailer_id       as node_id,
-                r.retailer_name     as label,
+                r.name              as label,
                 4                   as depth,
                 sh.node_id          as parent_id
             from shipment_level sh
@@ -175,7 +175,7 @@ def packaging_lot_scope(conn, packaging_lot_id: str, rows: list[tuple]) -> dict:
 
     # Retailer names
     cur.execute("""
-        select array_agg(distinct retailer_name)
+        select array_agg(distinct name)
         from raw.retailers where retailer_id = any(%s)
     """, (retailer_ids,))
     notification_list = cur.fetchone()[0] or []

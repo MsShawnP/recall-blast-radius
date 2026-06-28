@@ -7,16 +7,16 @@
 CREATE SCHEMA IF NOT EXISTS raw;
 
 CREATE TABLE IF NOT EXISTS raw.product_master (
-    sku_id          TEXT PRIMARY KEY,
-    sku_name        TEXT NOT NULL,
+    sku             TEXT PRIMARY KEY,           -- platform raw.product_master.sku
+    product_name    TEXT NOT NULL,              -- platform raw.product_master.product_name
     product_line    TEXT NOT NULL,    -- AS / PS / SC / DG / SB
-    cases_per_pallet INTEGER NOT NULL DEFAULT 60
+    cases_per_pallet INTEGER NOT NULL DEFAULT 60 -- stub-only: no platform equivalent
 );
 
 CREATE TABLE IF NOT EXISTS raw.retailers (
     retailer_id     TEXT PRIMARY KEY,
-    retailer_name   TEXT NOT NULL,
-    store_doors     INTEGER NOT NULL
+    name            TEXT NOT NULL,              -- platform raw.retailers.name
+    store_doors     INTEGER NOT NULL            -- stub-only: no platform equivalent
 );
 
 CREATE TABLE IF NOT EXISTS raw.shipments (
@@ -72,7 +72,7 @@ CREATE TABLE genealogy.ingredient_lots (
 -- Production batches: one run at the co-packer producing a single SKU.
 CREATE TABLE genealogy.production_batches (
     batch_id            TEXT PRIMARY KEY,           -- e.g. BTH-CP01-240312-01
-    sku_id              TEXT NOT NULL REFERENCES raw.product_master(sku_id),
+    sku_id              TEXT NOT NULL REFERENCES raw.product_master(sku),
     co_packer_id        TEXT NOT NULL REFERENCES genealogy.co_packers(co_packer_id),
     production_date     DATE NOT NULL,
     batch_quantity_cases INTEGER NOT NULL,
@@ -97,7 +97,7 @@ CREATE TABLE genealogy.batch_ingredient_map (
 CREATE TABLE genealogy.fg_lots (
     fg_lot_id           TEXT PRIMARY KEY,           -- e.g. FGL-CHP-AS-001-240312-001
     batch_id            TEXT NOT NULL REFERENCES genealogy.production_batches(batch_id),
-    sku_id              TEXT NOT NULL REFERENCES raw.product_master(sku_id),
+    sku_id              TEXT NOT NULL REFERENCES raw.product_master(sku),
     internal_lot_code   TEXT NOT NULL,              -- Cinderhaven's code (ERP)
     co_packer_lot_code  TEXT NOT NULL,              -- co-packer's code for same lot
     quantity_cases      INTEGER NOT NULL,

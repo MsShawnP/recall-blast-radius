@@ -185,7 +185,7 @@ def generate_all():
         "shipment_lot_map":    [],
         "scenarios":           [],
         "product_master":      [],
-        "retailers":           list({"retailer_id": r[0], "retailer_name": r[1],
+        "retailers":           list({"retailer_id": r[0], "name": r[1],
                                      "store_doors": r[2]} for r in RETAILERS),
         "shipments":           [],
     }
@@ -212,8 +212,8 @@ def generate_all():
         line = sku_id.split("-")[1]
         num  = int(sku_id.split("-")[2])
         records["product_master"].append({
-            "sku_id":           sku_id,
-            "sku_name":         f"{sku_info[line][0]} #{num:02d}",
+            "sku":              sku_id,
+            "product_name":     f"{sku_info[line][0]} #{num:02d}",
             "product_line":     line,
             "cases_per_pallet": 60,
         })

@@ -68,7 +68,7 @@ WITH RECURSIVE blast_radius AS (
     SELECT
         'retailer'                      AS node_type,
         s.retailer_id                   AS node_id,
-        r.retailer_name                 AS label,
+        r.name                          AS label,
         br.root_id,
         br.depth + 1                    AS depth,
         br.path || s.retailer_id        AS path

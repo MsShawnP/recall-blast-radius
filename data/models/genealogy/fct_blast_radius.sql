@@ -79,7 +79,7 @@ retailer_level as (
         sh.root_lot_id,
         'retailer'                  as node_type,
         r.retailer_id               as node_id,
-        r.retailer_name             as label,
+        r.name                      as label,
         4                           as depth,
         sh.node_id                  as parent_id
     from shipment_level sh
