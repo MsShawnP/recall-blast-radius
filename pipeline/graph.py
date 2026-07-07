@@ -145,7 +145,10 @@ def packaging_lot_rows(conn, packaging_lot_id: str) -> list[tuple]:
 def packaging_lot_scope(conn, packaging_lot_id: str, rows: list[tuple]) -> dict:
     """Compute scope for a packaging lot from its traversal rows."""
     fg_lot_ids = [r[2] for r in rows if r[1] == "fg_lot"]
-    shipment_ids = [r[2] for r in rows if r[1] == "shipment"]
+    # (shipment_id, fg_lot_id) pairs — a shipment row's parent_id is its fg_lot_id.
+    # Filtering shipment_lot_map on shipment_id alone would double-count shipments
+    # carrying 2+ affected lots and pull in unaffected lots on mixed shipments.
+    shipment_pairs = sorted({(r[2], r[5]) for r in rows if r[1] == "shipment"})
     retailer_ids = list({r[2] for r in rows if r[1] == "retailer"})
 
     if not fg_lot_ids:
@@ -163,14 +166,17 @@ def packaging_lot_scope(conn, packaging_lot_id: str, rows: list[tuple]) -> dict:
     """, (fg_lot_ids,))
     fg_row = dict(zip([d[0] for d in cur.description], cur.fetchone()))
 
-    # Cases in channel / sold through
+    # Cases in channel / sold through — join on the full (shipment_id, fg_lot_id)
+    # key so mixed shipments only contribute the affected lots' cases.
     cur.execute("""
-        select coalesce(sum(cases_shipped), 0) as cases_shipped,
-               coalesce(sum(cases_in_channel), 0) as cases_in_channel,
-               coalesce(sum(cases_sold_through), 0) as cases_sold_through
-        from genealogy.shipment_lot_map
-        where shipment_id = any(%s)
-    """, (shipment_ids,) if shipment_ids else ([],))
+        select coalesce(sum(slm.cases_shipped), 0) as cases_shipped,
+               coalesce(sum(slm.cases_in_channel), 0) as cases_in_channel,
+               coalesce(sum(slm.cases_sold_through), 0) as cases_sold_through
+        from genealogy.shipment_lot_map slm
+        join unnest(%s::text[], %s::text[]) as p(shipment_id, fg_lot_id)
+          on slm.shipment_id = p.shipment_id
+         and slm.fg_lot_id = p.fg_lot_id
+    """, ([p[0] for p in shipment_pairs], [p[1] for p in shipment_pairs]))
     ship_row = dict(zip([d[0] for d in cur.description], cur.fetchone()))
 
     # Retailer names
@@ -187,6 +193,8 @@ def packaging_lot_scope(conn, packaging_lot_id: str, rows: list[tuple]) -> dict:
         "skus_affected":      int(fg_row["skus_affected"] or 0),
         "cases_in_channel":   in_channel,
         "cases_sold_through": int(ship_row["cases_sold_through"] or 0),
+        # NOTE: the $9.00/$14.00 per-case low/high cost constants are duplicated in
+        # data/models/genealogy/fct_blast_radius_scope.sql — keep both in sync.
         "cost_low":           round(in_channel * 9.0, 2),
         "cost_high":          round(in_channel * 14.0, 2),
         "notification_list":  sorted(notification_list),
@@ -202,22 +210,4 @@ def scope_row_to_panel(row: dict) -> dict:
         "cases_sold_through": int(row.get("cases_sold_through") or 0),
         "cost_low":           round(float(row.get("direct_cost_low") or 0), 2),
         "cost_high":          round(float(row.get("direct_cost_high") or 0), 2),
-        "notification_list":  row.get("notification_list") or [],
-    }
-
-
-def graph_to_api_format(G: nx.DiGraph, root_lot_id: str, scope: dict) -> dict:
-    """Serialize a NetworkX graph to the TraceResult API shape."""
-    nodes = [
-        {"id": n, "type": d.get("type", "unknown"),
-         "label": d.get("label", n), "depth": d.get("depth")}
-        for n, d in G.nodes(data=True)
-    ]
-    edges = [{"source": s, "target": t} for s, t in G.edges()]
-    return {"lot_id": root_lot_id, "nodes": nodes, "edges": edges, "scope": scope}
-
-
-def _empty_scope() -> dict:
-    return {"lots_affected": 0, "skus_affected": 0, "cases_in_channel": 0,
-            "cases_sold_through": 0, "cost_low": 0.0, "cost_high": 0.0,
-            "notification_list": []}
+        "notification_list":  row.get("not

@@ -1,4 +1,5 @@
 import json
+import logging
 from pathlib import Path
 
 from fastapi import APIRouter, HTTPException
@@ -14,6 +15,8 @@ from pipeline.graph import (
     scope_row_to_panel,
     graph_to_api_format,
 )
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -74,9 +77,14 @@ def trace_lot(request: TraceRequest):
 def get_scenarios():
     """Return the three preset blast-radius scenario graphs (pre-computed cache)."""
     if not SCENARIO_CACHE.exists():
+        logger.error(
+            "Scenario cache not built yet at %s — run the genealogy_graph "
+            "Dagster asset to materialize it.",
+            SCENARIO_CACHE,
+        )
         raise HTTPException(
             status_code=503,
-            detail="Scenario cache not built yet. Run the genealogy_graph Dagster asset first.",
+            detail="Scenario data is temporarily unavailable — please try again in a minute.",
         )
     return json.loads(SCENARIO_CACHE.read_text())
 
@@ -108,12 +116,3 @@ def list_lots(q: str = ""):
                 ORDER BY il.received_date DESC
                 LIMIT 50
                 """
-            )
-        rows = cur.fetchall()
-        cur.close()
-        return [
-            {"lot_id": r[0], "ingredient": r[1], "received_date": r[2], "status": r[3]}
-            for r in rows
-        ]
-    finally:
-        conn.close()

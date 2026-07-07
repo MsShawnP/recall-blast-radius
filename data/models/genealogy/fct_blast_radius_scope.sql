@@ -34,8 +34,12 @@ shipment_scope as (
         sum(slm.cases_in_channel)       as cases_in_channel,
         sum(slm.cases_sold_through)     as cases_sold_through
     from nodes br
+    -- Join on the full (shipment_id, fg_lot_id) key: a shipment node's parent_id
+    -- is its fg_lot_id. Joining on shipment_id alone double-counts shipments that
+    -- carry 2+ affected lots and pulls in unaffected lots on mixed shipments.
     join {{ source('genealogy', 'shipment_lot_map') }} slm
         on slm.shipment_id = br.node_id
+        and slm.fg_lot_id = br.parent_id
     where br.node_type = 'shipment'
     group by br.root_lot_id
 ),
@@ -62,12 +66,6 @@ select
     coalesce(r.retailers_affected, 0)   as retailers_affected,
     coalesce(r.notification_list, '{}') as notification_list,
     -- Cost model: disposal $4/case + freight $1.50/case + retailer fees $2.50/case + admin $1.00/case
-    coalesce(s.cases_in_channel, 0) * 4.00  as disposal_cost,
-    coalesce(s.cases_in_channel, 0) * 1.50  as freight_cost,
-    coalesce(s.cases_in_channel, 0) * 2.50  as retailer_fee_cost,
-    coalesce(s.cases_in_channel, 0) * 1.00  as admin_cost,
-    coalesce(s.cases_in_channel, 0) * 9.00  as direct_cost_low,
-    coalesce(s.cases_in_channel, 0) * 14.00 as direct_cost_high
-from fg_lot_scope f
-full outer join shipment_scope s using (root_lot_id)
-full outer join retailer_scope r using (root_lot_id)
+    -- NOTE: the $9.00/$14.00 per-case low/high constants are duplicated in
+    -- pipeline/graph.py (packaging_lot_scope) — keep both in sync if they change.
+    coalesce(s.cases_in_channel, 0) * 4.00  as disposal_

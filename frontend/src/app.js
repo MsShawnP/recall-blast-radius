@@ -38,8 +38,8 @@ async function loadScenario(id) {
   } catch (err) {
     document.getElementById('graph-container').innerHTML =
       `<div class="graph-error">
-        <span>API unavailable</span>
-        <small>Start the API: uvicorn api.main:app --reload</small>
+        <span>Data unavailable</span>
+        <small>The data service is temporarily unavailable — please try again in a minute.</small>
       </div>`;
     document.getElementById('scope-panel').innerHTML =
       '<div style="padding:16px;font-size:12px;color:#9a9a9a;font-family:sans-serif">API offline</div>';
@@ -86,7 +86,9 @@ function renderScopePanel(scenario) {
 
   const channel  = scope.cases_in_channel;
   const sold     = scope.cases_sold_through;
-  const soldPct  = channel > 0 ? Math.min(100, Math.round((sold / channel) * 100)) : 0;
+  // Sold-through % = share of shipped cases (sold + still in channel) already sold.
+  const shipped  = sold + channel;
+  const soldPct  = shipped > 0 ? Math.round((sold / shipped) * 100) : 0;
   const notifiers = scope.notification_list ?? [];
 
   panel.innerHTML = `
@@ -190,8 +192,4 @@ function fmt(n) {
   return `$${n.toFixed(0)}`;
 }
 
-document.querySelectorAll('.scenario-btn').forEach(btn => {
-  btn.addEventListener('click', () => loadScenario(btn.dataset.scenario));
-});
-
-loadScenario(currentId);
+document.querySelectorAll(
