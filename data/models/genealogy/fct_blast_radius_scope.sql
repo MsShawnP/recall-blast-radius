@@ -68,4 +68,12 @@ select
     -- Cost model: disposal $4/case + freight $1.50/case + retailer fees $2.50/case + admin $1.00/case
     -- NOTE: the $9.00/$14.00 per-case low/high constants are duplicated in
     -- pipeline/graph.py (packaging_lot_scope) — keep both in sync if they change.
-    coalesce(s.cases_in_channel, 0) * 4.00  as disposal_
+    coalesce(s.cases_in_channel, 0) * 4.00  as disposal_cost,
+    coalesce(s.cases_in_channel, 0) * 1.50  as freight_cost,
+    coalesce(s.cases_in_channel, 0) * 2.50  as retailer_fee_cost,
+    coalesce(s.cases_in_channel, 0) * 1.00  as admin_cost,
+    coalesce(s.cases_in_channel, 0) * 9.00  as direct_cost_low,
+    coalesce(s.cases_in_channel, 0) * 14.00 as direct_cost_high
+from fg_lot_scope f
+full outer join shipment_scope s using (root_lot_id)
+full outer join retailer_scope r using (root_lot_id)

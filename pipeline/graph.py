@@ -210,4 +210,22 @@ def scope_row_to_panel(row: dict) -> dict:
         "cases_sold_through": int(row.get("cases_sold_through") or 0),
         "cost_low":           round(float(row.get("direct_cost_low") or 0), 2),
         "cost_high":          round(float(row.get("direct_cost_high") or 0), 2),
-        "notification_list":  row.get("not
+        "notification_list":  row.get("notification_list") or [],
+    }
+
+
+def graph_to_api_format(G: nx.DiGraph, root_lot_id: str, scope: dict) -> dict:
+    """Serialize a NetworkX graph to the TraceResult API shape."""
+    nodes = [
+        {"id": n, "type": d.get("type", "unknown"),
+         "label": d.get("label", n), "depth": d.get("depth")}
+        for n, d in G.nodes(data=True)
+    ]
+    edges = [{"source": s, "target": t} for s, t in G.edges()]
+    return {"lot_id": root_lot_id, "nodes": nodes, "edges": edges, "scope": scope}
+
+
+def _empty_scope() -> dict:
+    return {"lots_affected": 0, "skus_affected": 0, "cases_in_channel": 0,
+            "cases_sold_through": 0, "cost_low": 0.0, "cost_high": 0.0,
+            "notification_list": []}

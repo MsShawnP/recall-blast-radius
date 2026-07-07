@@ -116,3 +116,12 @@ def list_lots(q: str = ""):
                 ORDER BY il.received_date DESC
                 LIMIT 50
                 """
+            )
+        rows = cur.fetchall()
+        cur.close()
+        return [
+            {"lot_id": r[0], "ingredient": r[1], "received_date": r[2], "status": r[3]}
+            for r in rows
+        ]
+    finally:
+        conn.close()

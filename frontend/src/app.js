@@ -192,4 +192,8 @@ function fmt(n) {
   return `$${n.toFixed(0)}`;
 }
 
-document.querySelectorAll(
+document.querySelectorAll('.scenario-btn').forEach(btn => {
+  btn.addEventListener('click', () => loadScenario(btn.dataset.scenario));
+});
+
+loadScenario(currentId);
