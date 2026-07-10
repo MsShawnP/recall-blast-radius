@@ -8,17 +8,24 @@ let currentId = 'A';
 
 async function fetchScenarios() {
   if (scenarioCache) return scenarioCache;
-  const ctrl = new AbortController();
-  const t = setTimeout(() => ctrl.abort(), 5000);
-  let res;
-  try {
-    res = await fetch(`${API_BASE}/scenarios`, { signal: ctrl.signal });
-  } finally {
-    clearTimeout(t);
+  const MAX_TRIES = 3;
+  const BACKOFF = [0, 1500, 3000];
+  for (let attempt = 0; attempt < MAX_TRIES; attempt++) {
+    if (BACKOFF[attempt]) await new Promise(r => setTimeout(r, BACKOFF[attempt]));
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 8000);
+    try {
+      const res = await fetch(`${API_BASE}/scenarios`, { signal: ctrl.signal });
+      clearTimeout(t);
+      if (!res.ok) throw new Error(`API error: ${res.status}`);
+      scenarioCache = await res.json();
+      return scenarioCache;
+    } catch (err) {
+      clearTimeout(t);
+      if (attempt < MAX_TRIES - 1) continue;
+      throw err;
+    }
   }
-  if (!res.ok) throw new Error(`API error: ${res.status}`);
-  scenarioCache = await res.json();
-  return scenarioCache;
 }
 
 async function loadScenario(id) {
@@ -29,20 +36,22 @@ async function loadScenario(id) {
     b.classList.toggle('active', b.dataset.scenario === id);
   });
 
-  document.getElementById('graph-container').innerHTML =
-    '<div class="graph-loading">Loading…</div>';
+  const graphEl = document.getElementById('graph-container');
+  const panelEl = document.getElementById('scope-panel');
+  graphEl.innerHTML = '<div class="graph-loading">Loading …</div>';
+  panelEl.innerHTML = '';
 
   let scenarios;
   try {
     scenarios = await fetchScenarios();
   } catch (err) {
-    document.getElementById('graph-container').innerHTML =
+    graphEl.innerHTML =
       `<div class="graph-error">
-        <span>Data unavailable</span>
-        <small>The data service is temporarily unavailable — please try again in a minute.</small>
+        <span>Could not reach the data service</span>
+        <small>The server did not respond after several attempts. Reload the page to try again.</small>
       </div>`;
-    document.getElementById('scope-panel').innerHTML =
-      '<div style="padding:16px;font-size:12px;color:#9a9a9a;font-family:sans-serif">API offline</div>';
+    panelEl.innerHTML =
+      '<div style="padding:16px;font-size:12px;color:#9a9a9a;font-family:sans-serif">Unavailable</div>';
     return;
   }
 
