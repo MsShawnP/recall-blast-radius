@@ -11,7 +11,7 @@ A food recall is a graph problem. Pick an ingredient lot, a production run, or a
 Three preset scenarios show how blast radius scales non-linearly with where in the BOM the contamination sits:
 
 - **Scenario A — Single ingredient lot:** one input, one product line, bounded impact
-- **Scenario B — Shared ingredient across lines:** one chili lot, 14 SKUs, 3 product lines — the gut-punch case
+- **Scenario B — Shared ingredient across lines:** one chili lot, 14 SKUs, 2 product lines — the gut-punch case
 - **Scenario C — Packaging lot:** spans everything sharing a label run, irrespective of ingredient
 
 Each scenario produces: units in channel, estimated sold-through, direct cost range (disposal + freight + retailer handling + admin), and the notification list. An FSMA 204 KDE/CTE mapping table shows which Key Data Elements at which Critical Tracking Events the data captures and where the gaps are.
