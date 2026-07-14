@@ -122,6 +122,13 @@ body {
   color: #fff;
 }
 
+/* Visible keyboard focus for interactive controls */
+.scenario-btn:focus-visible,
+.pin-card__close:focus-visible {
+  outline: 2px solid var(--navy);
+  outline-offset: 2px;
+}
+
 .blast-layout {
   display: grid;
   grid-template-columns: 1fr 300px;
@@ -701,6 +708,11 @@ body {
   font-size: 13px;
   color: var(--text-secondary);
   line-height: 1.5;
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .scope-bar__fill { transition: none; }
 }
 
 /* ── Mobile ── */
