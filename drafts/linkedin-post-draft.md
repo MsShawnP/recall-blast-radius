@@ -25,4 +25,4 @@ I built an interactive version — trace any lot forward and watch the blast rad
 
 ---
 
-*Alt text for the screen capture: "Network graph showing one ingredient lot fanning out through 23 production batches into 14 SKUs, ending at 6
+*Alt text for the screen capture: "Network graph showing one ingredient lot fanning out through 23 production batches into 14 SKUs, ending at 6 retailers — 5,785 cases in channel."*
