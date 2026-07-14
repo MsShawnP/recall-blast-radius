@@ -151,6 +151,15 @@ body {
   top: 24px;
 }
 
+.graph-disclosure {
+  font-family: 'Source Sans 3', 'Source Sans Pro', sans-serif;
+  font-size: 11px;
+  font-style: italic;
+  color: var(--reference);
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+
 /* ── Scenario description ── */
 .scenario-desc {
   margin-bottom: 16px;
