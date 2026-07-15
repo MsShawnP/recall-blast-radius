@@ -84,6 +84,27 @@ export function renderGraph(selector, traceResult) {
   // and d3.zoom both write to it.
   const zoomLayer = svg.append('g').attr('class', 'zoom-layer');
 
+  // Visually-hidden scope summary, exposed to screen readers via aria-describedby.
+  // The SVG force graph is not keyboard-navigable node-by-node, so this text
+  // gives non-visual users the same scope the metrics panel shows. Rebuilt on
+  // every scenario switch because renderGraph re-runs and clears the container.
+  const summary = document.createElement('p');
+  summary.id = 'graph-scope-summary';
+  summary.className = 'sr-only';
+  summary.textContent = buildScopeSummary(traceResult.scope);
+  container.appendChild(summary);
+
+  // Label the graph itself: role="img" collapses the node soup into one
+  // describable figure, with the label naming what the diagram is and
+  // aria-describedby pointing at the live scope numbers above.
+  svg
+    .attr('role', 'img')
+    .attr('aria-label',
+      'Recall trace graph: a node-link diagram tracing contaminated lots ' +
+      'through production batches, finished-goods lots, shipments, and the ' +
+      'retailers that received them.')
+    .attr('aria-describedby', 'graph-scope-summary');
+
   const { nodes, edges } = traceResult;
   const simNodes = nodes.map(n => ({ ...n }));
   // D3 forceLink mutates source/target from string ids to node objects in-place
@@ -260,6 +281,23 @@ export function renderGraph(selector, traceResult) {
     </span>
   `).join('');
   container.appendChild(legendDiv);
+}
+
+// Plain-text scope summary read to screen-reader users in place of the visual
+// graph. Mirrors the numbers in the scope panel: cases in channel, lots, SKUs,
+// and the retailers to notify.
+function buildScopeSummary(scope) {
+  if (!scope) return 'Scenario scope is unavailable.';
+  const retailers = scope.notification_list ?? [];
+  const retailerText = retailers.length
+    ? `${retailers.length} ${retailers.length === 1 ? 'retailer' : 'retailers'} to notify: ${retailers.join(', ')}.`
+    : 'no retailers flagged for notification.';
+  return (
+    `Scenario scope: ${scope.cases_in_channel.toLocaleString()} cases in channel, ` +
+    `spanning ${scope.lots_affected} ${scope.lots_affected === 1 ? 'lot' : 'lots'} ` +
+    `and ${scope.skus_affected} ${scope.skus_affected === 1 ? 'SKU' : 'SKUs'}, ` +
+    `reaching ${retailerText}`
+  );
 }
 
 function buildPinCardHTML(d) {

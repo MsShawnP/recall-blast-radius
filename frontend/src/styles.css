@@ -135,6 +135,19 @@ body {
   gap: 24px;
 }
 
+/* Visually hidden but exposed to screen readers (accessible graph summary). */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 #graph-container {
   position: relative;
   background: #fff;
