@@ -7,7 +7,9 @@
 
 ## Current Focus
 
-Phase 7 complete. No pending CC work.
+Phase 7 complete. **2026-07-18:** post-launch maintenance arc done — security hardening (env-only DB config; leaked-but-dead credential removed from source/history), platform schema migration (`sku_id→sku`, `retailer_name→name`; reseed + dbt + cache), and redeploy. All verified live. No pending CC work on recall itself.
+
+Parked (needs explicit go-ahead — shared infra): cinderhaven-db's own `pg`-check / flex monitor credential state.
 
 ---
 

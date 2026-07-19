@@ -4,6 +4,30 @@ Approaches that didn't work and why. Read before repeating.
 
 ---
 
+## 2026-07-18 — Per-row seed over the Fly proxy is slow and fragile
+
+**What failed:** `pipeline/seed.py` loads ~11k rows as individual `cur.execute` INSERTs inside one transaction. Over the Fly proxy this takes minutes, and the proxy tunnel (and a session teardown) dropped mid-load twice — each time the whole transaction rolled back, leaving the DDL-created tables empty. A `| grep` on the command also masked Python's real non-zero exit code (looked like exit 0).
+
+**Why:** ~11k network round-trips over a flaky tunnel is a long exposure window; single-transaction load is all-or-nothing.
+
+**Fix:** Batched loader — `psycopg2.extras.execute_values`, one round-trip per table (~13 total). Finished in seconds. For pipe commands, check the process's own exit code, not the pipe's.
+
+**Tags:** seed, fly-proxy, reliability, postgres
+
+---
+
+## 2026-07-18 — `localhost:5432` connected to the wrong database
+
+**What failed:** Local pipeline connections via `localhost:5432` hit a local Postgres on the dev machine (`localhost` → `::1`; a local PG also squats `127.0.0.1:5432`) instead of the Fly proxy → cinderhaven-db. Surfaced as `password authentication failed for user "recall_blast_radius_app"` even though the credential was correct.
+
+**Why:** A local Postgres occupies `127.0.0.1:5432`/`::1:5432`; `localhost` resolves to IPv6 first.
+
+**Fix:** Proxy on a dedicated port (`fly proxy 15432:5432`) and connect to `127.0.0.1:15432` explicitly. See D-017.
+
+**Tags:** local-dev, networking, fly-proxy, postgres
+
+---
+
 ## 2026-06-11 — Filesystem search for lailara-website repo was slow
 
 **What failed:** Multiple `find` / `glob` / `grep` searches across `projects/active`, `projects/published`, and `projects/reference` to locate the lailara-website source. Took several rounds before finding it at `C:\Users\mssha\projects\reference\lailara-website\site`.

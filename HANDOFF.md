@@ -1,5 +1,17 @@
 # HANDOFF — recall-blast-radius
 
+## 2026-07-18 22:30 (wrap)
+
+**Started from:** recall live (Phase 7 done). Session opened as a 2-change scenario-viz request; grew into a security incident + full schema migration.
+
+**Did:** (1) Graph containment (viewBox + zoom-to-fit + collision + label culling) + persistent A/B/C comparison strip, verified in-browser (`ea30831`). (2) Security: removed the (dead, already-rotated) recall DB password from source — env-only config, no fallback (`1ef7c20`, `0c0aad8`); full-history scan clean; rotated recall role; recovered cinderhaven-db superuser via in-machine trust socket. (3) Schema migration Option A: aligned standalone `raw` stubs to platform naming `sku_id→sku` / `sku_name→product_name` / `retailer_name→name` across DDL/seeds/generator/queries/dbt (`e1549de`); drop+recreate reseed of `recall_blast_radius.{raw,genealogy}`, `dbt run`+`test` (52 pass), cache regen (`cafa926`); deployed + verified live.
+
+**State:** Deployed & verified — `/health`, `/api/scenarios`, `/api/lots`, packaging-lot `/api/trace` all 200; figures match canonical (50 SKUs / 6 retailers). Tree clean, all code pushed. Parked (do not touch without go-ahead): cinderhaven-db's own `pg`-check/monitor credential state. Local `data/profiles.yml` on proxy port 15432 (gitignored).
+
+**Next:** Nothing open on recall itself. If cinderhaven-db's app `pg` check is still critical, that's the narrower flex monitor/exporter issue — explicit go-ahead required before touching cinderhaven-db secrets/roles.
+
+---
+
 ## 2026-06-18 (wrap)
 
 **Started from:** Phase 7 done (portfolio card committed, lailara-website not yet pushed). recall.lailarallc.com live, UI review not yet run.

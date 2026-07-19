@@ -2,6 +2,48 @@
 
 ---
 
+## D-018 — recall stays standalone `raw` stubs; do NOT migrate to platform `cinderhaven.raw`
+
+**Decision:** recall creates and queries its own `raw` stub schema (`product_master`, `retailers`, `shipments`) in its own `recall_blast_radius` database. Do not repoint it at the platform's canonical `raw`.
+
+**Date:** 2026-07-18
+
+**Why:** The platform `raw` lives in a *separate* `cinderhaven` database on the same cluster — cross-database FKs are impossible, `public_marts` doesn't exist, and recall models retailers only (no distributors/sku_costs). "Aligning to the platform" means matching column *names* (Option A), not consuming platform tables (Option B, which is architecturally infeasible without postgres_fdw or moving schemas).
+
+**Scope:** Any future "sync recall to the platform" request.
+
+**Do not:** Attempt to drop the stubs and read `cinderhaven.raw` directly, or add cross-database FKs.
+
+---
+
+## D-017 — Local proxy to cinderhaven-db uses a non-5432 port + explicit 127.0.0.1
+
+**Decision:** When proxying to cinderhaven-db for local recall work, use a dedicated local port (e.g. `fly proxy 15432:5432 -a cinderhaven-db`) and connect to `127.0.0.1:15432` — never `localhost:5432`.
+
+**Date:** 2026-07-18
+
+**Why:** A local Postgres squats `127.0.0.1:5432` (and `::1:5432`) on Shawn's machine; `localhost` resolves to `::1`. Using `localhost:5432` silently connects to the wrong DB and produces confusing auth failures. Verified 2026-07-18.
+
+**Scope:** All local recall pipeline/dbt/seed work against cinderhaven-db.
+
+**Do not:** Use `localhost` or port 5432 for the proxy; don't assume an auth failure means the credential is wrong before checking you're hitting the proxy, not the local Postgres.
+
+---
+
+## D-016 — DB connection config is env-only; no hardcoded credential fallback
+
+**Decision:** `get_conn()` reads `DATABASE_URL` from the environment and raises if unset. No connection string with real credentials is ever a code default.
+
+**Date:** 2026-07-18
+
+**Why:** The repo is public. A hardcoded fallback `DATABASE_URL` leaked the `recall_blast_radius_app` password into source and git history. Env-only prevents recurrence.
+
+**Scope:** `api/db.py`, `pipeline/build_cache.py`, `pipeline/seed.py`, `pipeline/assets.py`, and any new DB-touching module.
+
+**Do not:** Add a `os.environ.get("DATABASE_URL", "postgresql://…real creds…")` fallback, or commit `.env` / `data/profiles.yml` (both gitignored).
+
+---
+
 ## D-015 — Playfair Display minimum line-height for display-size numbers
 
 **Decision:** Set `line-height: 1.1` (minimum) on any Playfair Display element above 20px. Never use `line-height: 1` on large serif text.
