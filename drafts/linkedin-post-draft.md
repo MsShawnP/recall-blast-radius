@@ -11,13 +11,13 @@ It's 2pm on a Friday. Your supplier just called: one ingredient lot failed a pat
 
 How bad this gets is already decided — it was decided months ago, every time your co-manufacturer drew from the same pallet of chili flakes for another production run.
 
-I modeled this on a synthetic $25M specialty food brand:
+I modeled this on a synthetic specialty food brand doing $33.4M TTM (retail scan, through 2025-12-27):
 
 Scenario A — the lot went into one production run. A contained, documented retrieval.
 
 Scenario B — the same lot fed 23 production batches. 23 affected lots. 14 SKUs across two product lines. 6 retailers to notify. 5,785 cases still in channel. That's 47.8× the blast radius of Scenario A, from one shared ingredient lot.
 
-The cost gap is the whole story. Targeted retrieval in Scenario B: $52K–$81K. A full recall, because you can't prove which lots are clean: $10M+ — against roughly $2.75M of annual EBITDA. Three-plus years of earnings, gone on the difference between knowing and guessing.
+The cost gap is the whole story. Targeted retrieval in Scenario B: $52K–$81K. A full recall, because you can't prove which lots are clean: $10M+ — against roughly $3.7M of annual EBITDA (an assumed 11%). Nearly three years of earnings, gone on the difference between knowing and guessing.
 
 The difference between A and B isn't ingredient risk. It's whether the batch genealogy exists when the phone rings. FSMA 204 is about to make that record-keeping non-optional for a long list of foods.
 
