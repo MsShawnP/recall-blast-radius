@@ -2,7 +2,7 @@
 
 **Status:** Shipped — live at [recall.lailarallc.com](https://recall.lailarallc.com)
 **Updated:** July 13, 2026. Rewritten against the shipped tool. Supersedes the June 10 pre-build brief, whose Scenario B economics ($600K–$1.2M) were a guess made before the cost model existed. Every figure below traces to a repo artifact; the ledger at the end lists each one.
-**Dataset disclosure:** Cinderhaven Provisions is synthetic — a fabricated specialty food brand doing $33.4M TTM revenue (retail scan, through 2025-12-27; 50 SKUs, 5 product lines, 6 retailers, genealogy seed=400, registered in `CINDERHAVEN_CANONICAL.md`). Cinderhaven is not a client and its numbers are illustrative. The methodology, the data model, and the deliverables are real.
+**Dataset disclosure:** Cinderhaven Provisions is synthetic — a fabricated specialty food brand doing $33.2M TTM revenue (retail scan, through 2025-12-27; 50 SKUs, 5 product lines, 6 retailers, genealogy seed=400, registered in `CINDERHAVEN_CANONICAL.md`). Cinderhaven is not a client and its numbers are illustrative. The methodology, the data model, and the deliverables are real.
 
 ---
 
@@ -30,7 +30,7 @@ Scenario C rounds out the curve: a packaging lot — one label run — implicate
 
 The tool prices Scenario B at $52K–$81K. That figure is total direct retrieval cost, and it is deliberately narrow: 5,785 in-channel cases × $9–$14 per case (disposal $4, freight $1.50, retailer handling fees $2.50, administration $1). It excludes sold-through units, lab testing, legal, PR, disposal of returned consumer units, lost shelf placement, and brand damage. It also assumes the recall is scoped to exactly the 23 affected lots — which is the entire premise of the tool.
 
-Set that against the industry-average cost of a full recall: $10M+ (Deloitte/GMA/FMI, 2010 — a conservative floor, before attorney fees or brand damage). The two numbers are not in tension; the gap between them is the argument. $10M is what happens when a brand — usually a larger one — cannot prove which lots are clean and withdraws broadly, then pays for testing, legal, PR, and shelf recovery on top. $52K–$81K is what a mid-size brand pays to retrieve exactly what one lot touched, and nothing else. Against Cinderhaven's estimated annual EBITDA of ~$3.7M (an assumed 11% of $33.4M TTM retail scan revenue, through 2025-12-27), the full-recall figure is roughly 2.7 years of earnings. The scoped figure is a bad month.
+Set that against the industry-average cost of a full recall: $10M+ (Deloitte/GMA/FMI, 2010 — a conservative floor, before attorney fees or brand damage). The two numbers are not in tension; the gap between them is the argument. $10M is what happens when a brand — usually a larger one — cannot prove which lots are clean and withdraws broadly, then pays for testing, legal, PR, and shelf recovery on top. $52K–$81K is what a mid-size brand pays to retrieve exactly what one lot touched, and nothing else. Against Cinderhaven's estimated annual EBITDA of ~$3.7M (an assumed 11% of $33.2M TTM retail scan revenue, through 2025-12-27), the full-recall figure is roughly 2.7 years of earnings. The scoped figure is a bad month.
 
 One footnote on the superseded brief: its $600K–$1.2M "Scenario B" guess turns out to sit near the shipped Scenario C ($491K–$764K) — the everything-case, not the shared-ingredient case. The pre-build instinct overshot B by an order of magnitude and accidentally priced the worst case. That is what modeling instead of asserting buys.
 
@@ -65,7 +65,7 @@ Every number in this brief, and where it lives in the repo.
 | Scenario C scope | 218 lots, 50 SKUs, 54,576 cases in channel, $491K–$764K | `pipeline/cache/scenario_graphs.json` (scenario C `scope`) |
 | Cost model | $9–$14 per in-channel case: disposal $4 + freight $1.50 + retailer fees $2.50 + admin $1; direct retrieval only | `data/models/genealogy/fct_blast_radius_scope.sql` (duplicated in `pipeline/graph.py`) |
 | Full-recall industry average | $10M+ | `frontend/index.html` hook + footnote (Deloitte/GMA/FMI, 2010) |
-| Cinderhaven EBITDA | ~$3.7M (assumed 11% × $33.4M TTM retail scan revenue, through 2025-12-27) | `frontend/index.html` margin-math block |
+| Cinderhaven EBITDA | ~$3.7M (assumed 11% × $33.2M TTM retail scan revenue, through 2025-12-27) | `frontend/index.html` margin-math block |
 | FSMA 204 deadline | July 20, 2028 (FR Doc. 2025-14967 + Continuing Appropriations Act of 2026) | `frontend/index.html` evidence footnote |
 | KDE/CTE coverage | 17 KDEs, 2 gaps (BOL reference docs) | `frontend/index.html` KDE table |
 | Dataset baseline | 50 SKUs, 5 product lines, 6 retailers, seed=400, synthetic | `README.md` data contract |

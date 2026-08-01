@@ -20,7 +20,7 @@ Each scenario produces: units in channel, estimated sold-through, direct cost ra
 
 At most $25M brands, the honest answer to "what's our blast radius?" is "give us three days" — while the FDA wants lot-level records within 24 hours and product keeps selling through. Scoping the recall in hours instead of days directly reduces units to dispose, retailers to notify unnecessarily, and administrative cost. The same genealogy backbone is what FSMA 204 traceability compliance requires.
 
-Built on the Cinderhaven synthetic dataset — a specialty food brand doing $33.4M TTM revenue (retail scan, through 2025-12-27), 50 SKUs across 5 product lines and 6 contracted retailers. Data is synthetic; methodology and deliverables are real.
+Built on the Cinderhaven synthetic dataset — a specialty food brand doing $33.2M TTM revenue (retail scan, through 2025-12-27), 50 SKUs across 5 product lines and 6 contracted retailers. Data is synthetic; methodology and deliverables are real.
 
 ## Quick start
 

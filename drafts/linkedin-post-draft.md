@@ -11,7 +11,7 @@ It's 2pm on a Friday. Your supplier just called: one ingredient lot failed a pat
 
 How bad this gets is already decided — it was decided months ago, every time your co-manufacturer drew from the same pallet of chili flakes for another production run.
 
-I modeled this on a synthetic specialty food brand doing $33.4M TTM (retail scan, through 2025-12-27):
+I modeled this on a synthetic specialty food brand doing $33.2M TTM (retail scan, through 2025-12-27):
 
 Scenario A — the lot went into one production run. A contained, documented retrieval.
 
