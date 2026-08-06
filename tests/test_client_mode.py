@@ -66,6 +66,30 @@ def test_deliverable_has_notification_list_and_draft(tmp_path):
     assert "DRAFT" in html
 
 
+def test_title_tracks_seed_lot_not_hardcoded(tmp_path):
+    """The deliverable title scopes the recall to a specific seed lot ('Recall
+    Blast Radius — Lot {seed}'), the parameter every cases/cost figure is
+    computed from. The suite asserted the demo's own 'Lot ING-1' plus the
+    cases/cost numbers; a hardcoded seed in the title would mislabel whose blast
+    radius the money figure describes — the label-vs-data mismatch class behind
+    trade-spend's 'trailing 52 weeks'.
+
+    Both halves: two seed lots, assert each title tracks its seed AND the other
+    seed's title is absent."""
+    gp, sp = _write(tmp_path)
+    res_a = client_mode.run(str(_cfg(tmp_path, seed="ING-1")), str(tmp_path / "out_a"),
+                            _args(str(gp), str(sp)))
+    html_a = Path(res_a["report"]).read_text(encoding="utf-8")
+    assert "Recall Blast Radius — Lot ING-1" in html_a
+    assert "Recall Blast Radius — Lot B-1" not in html_a
+
+    res_b = client_mode.run(str(_cfg(tmp_path, seed="B-1")), str(tmp_path / "out_b"),
+                            _args(str(gp), str(sp)))
+    html_b = Path(res_b["report"]).read_text(encoding="utf-8")
+    assert "Recall Blast Radius — Lot B-1" in html_b
+    assert "Recall Blast Radius — Lot ING-1" not in html_b    # not fixed to the demo seed
+
+
 def test_missing_cases_in_channel_blocks(tmp_path):
     gp, sp = _write(tmp_path)
     pd.read_csv(sp).drop(columns=["cases_in_channel"]).to_csv(sp, index=False)
