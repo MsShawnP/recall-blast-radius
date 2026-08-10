@@ -37,3 +37,9 @@ docker-compose.yml
 # Docs
 *.md
 brief_*.md
+
+# --- lailara engagement scaffold ---
+client-data/
+client-output/
+engagement.yml
+engagement.yaml

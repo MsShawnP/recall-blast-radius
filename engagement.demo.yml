@@ -1,0 +1,40 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Lailara LLC — Recall Blast Radius engagement config (DEMO)
+#
+# Demo identity is the canonical Cinderhaven brand; `demo: true` so the deploy
+# guard ignores it. The deployed demo traces the seeded Postgres genealogy —
+# this config exercises client_mode.py on demo-shaped genealogy/ship-to files
+# under client-data/ (gitignored, never committed).
+# ─────────────────────────────────────────────────────────────────────────────
+
+client:
+  name: "Cinderhaven Provisions (demo)"
+
+engagement:
+  id: "CINDERHAVEN-DEMO"
+
+as_of_date: "2025-12-27"
+
+prepared_by: "Lailara LLC"
+
+demo: true
+
+basis:
+  seed_lot: "ING-001"          # the lot to trace forward from
+
+inputs:
+  genealogy: "client-data/genealogy.csv"
+  shipto: "client-data/shipto.csv"
+
+columns:
+  parent_lot_id: "parent_lot_id"
+  child_lot_id: "child_lot_id"
+  child_type: "child_type"
+  fg_lot_id: "fg_lot_id"
+  ship_to: "ship_to"
+  cases_in_channel: "cases_in_channel"
+  cases_shipped: "cases_shipped"
+  cases_sold_through: "cases_sold_through"
+
+thresholds:
+  fail_on_missing_required_column: true
