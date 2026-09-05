@@ -1,0 +1,27 @@
+name: Deploy frontend to Cloudflare Pages
+
+# recall is split: fly-deploy.yml ships the FastAPI backend (/api) to Fly, but the
+# static frontend (served at / by Pages project recall-blast-radius) had NO CI — it
+# was hand-deployed, so a frontend push published nothing and the page could drift.
+# This deploys the frontend on push, matching the fleet Pages pattern.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "frontend/**"
+      - ".github/workflows/frontend-deploy.yml"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy frontend to Pages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: wrangler pages deploy
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy frontend --project-name recall-blast-radius --branch=main
